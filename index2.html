@@ -1,224 +1,1119 @@
+bash
+
+LOGO_B64=$(base64 /mnt/user-data/uploads/photo_2026-05-28_23-59-32__2_.jpg | tr -d '\n')
+
+cat > /mnt/user-data/outputs/nashteam-marketplace.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html dir="rtl" lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بازارچه طراحی چاپ - نسخه کامل</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Vazirmatn', Tahoma, sans-serif; background: #f0f4f8; padding: 20px; direction: rtl; }
-        @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
-        .container { max-width: 1300px; margin: 0 auto; }
-        .header { background: white; padding: 15px 25px; border-radius: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
-        .logo { font-size: 1.4rem; font-weight: bold; }
-        .logout-btn { background: #ef4444; color: white; border: none; padding: 8px 18px; border-radius: 30px; cursor: pointer; }
-        .dashboard { background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; }
-        .tabs { display: flex; gap: 10px; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab { padding: 10px 20px; cursor: pointer; background: none; border: none; font-weight: bold; color: #64748b; }
-        .tab.active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-        .card { border: 1px solid #e2e8f0; border-radius: 20px; padding: 15px; background: #fafcff; }
-        .price { font-size: 1.4rem; font-weight: bold; margin: 10px 0; }
-        button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; margin: 4px; }
-        button.danger { background: #ef4444; }
-        button.success { background: #10b981; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 16px; border: 1px solid #cbd5e1; }
-        .message { background: #f1f5f9; padding: 10px; border-radius: 16px; margin: 10px 0; }
-        .discount-badge { background: #f59e0b; padding: 8px 16px; border-radius: 40px; display: inline-block; margin: 10px 0; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nash Team | بازارچه طراحی چاپ</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+/* ===== متغیرها ===== */
+:root{
+  --orange:#E85D04;--orange2:#F48C06;--dark:#1C1C1E;--dark2:#252528;
+  --dark3:#2E2E32;--white:#F5F5F7;--muted:#8E8E93;--radius:16px;
+  --radius-lg:24px;--radius-xl:32px;
+  --shadow:0 8px 32px rgba(0,0,0,.45);
+  --glow:0 0 24px rgba(232,93,4,.35);
+  --t:.3s cubic-bezier(.4,0,.2,1);
+  --font:'Vazirmatn',Tahoma,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--dark);color:var(--white);overflow-x:hidden;direction:rtl;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--dark);}::-webkit-scrollbar-thumb{background:var(--orange);border-radius:3px;}
+a{text-decoration:none;color:inherit;}
+img{max-width:100%;}
+
+/* ===== ناوبار ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.9rem 2rem;
+  background:rgba(28,28,30,.82);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(232,93,4,.2);
+}
+.nav-logo img{height:40px;border-radius:10px;object-fit:cover;}
+.nav-links{display:flex;align-items:center;gap:.4rem;}
+.nav-btn{
+  background:none;border:none;color:var(--muted);font-family:var(--font);
+  font-size:.88rem;font-weight:600;cursor:pointer;padding:.55rem 1rem;
+  border-radius:50px;transition:var(--t);
+}
+.nav-btn:hover,.nav-btn.active{color:var(--white);background:rgba(232,93,4,.15);}
+.nav-btn.active{color:var(--orange);}
+.btn-cta{
+  background:var(--orange);color:#fff;border:none;
+  padding:.6rem 1.4rem;border-radius:50px;font-family:var(--font);
+  font-size:.88rem;font-weight:700;cursor:pointer;transition:var(--t);
+  box-shadow:var(--glow);
+}
+.btn-cta:hover{background:var(--orange2);transform:translateY(-1px);}
+.user-chip{
+  display:flex;align-items:center;gap:.5rem;
+  background:var(--dark3);border-radius:50px;padding:.4rem .9rem;
+  font-size:.84rem;font-weight:600;
+}
+.user-chip .av{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--orange);display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:900;color:#fff;
+}
+
+/* ===== دکمه‌ها ===== */
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.7rem 1.6rem;border:none;border-radius:50px;
+  font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;
+  transition:var(--t);position:relative;overflow:hidden;
+}
+.btn::before{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.25),transparent);
+  transition:.55s ease;
+}
+.btn:hover::before{left:150%;}
+.btn-primary{background:var(--orange);color:#fff;box-shadow:var(--glow);}
+.btn-primary:hover{background:var(--orange2);transform:translateY(-2px);}
+.btn-secondary{background:var(--dark3);color:var(--white);}
+.btn-secondary:hover{background:#3a3a3f;}
+.btn-outline{background:transparent;border:1.5px solid var(--orange);color:var(--orange);}
+.btn-outline:hover{background:rgba(232,93,4,.1);}
+.btn-danger{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);}
+.btn-danger:hover{background:rgba(239,68,68,.25);}
+.btn-sm{padding:.45rem 1rem;font-size:.82rem;}
+.btn-full{width:100%;justify-content:center;}
+
+/* ===== صفحات ===== */
+.page{display:none;min-height:100vh;padding-top:70px;}
+.page.active{display:block;animation:fadeUp .4s ease both;}
+
+/* ===== هوم ===== */
+.hero{
+  min-height:92vh;display:flex;align-items:center;justify-content:center;
+  padding:4rem 2rem 3rem;text-align:center;position:relative;overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 50% 40%,rgba(232,93,4,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+}
+.hero-content{position:relative;z-index:1;max-width:720px;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(232,93,4,.1);border:1px solid rgba(232,93,4,.3);
+  border-radius:50px;padding:.4rem 1.2rem;font-size:.82rem;color:var(--orange);
+  font-weight:700;margin-bottom:1.5rem;
+}
+.hero h1{
+  font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1.15;
+  margin-bottom:1.2rem;
+}
+.hero h1 span{
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{font-size:1.05rem;color:var(--muted);margin-bottom:2rem;line-height:1.8;}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+
+/* آمار هوم */
+.home-stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:1.2rem;padding:0 2rem 4rem;max-width:1100px;margin:0 auto;
+}
+.stat-box{
+  background:var(--dark2);border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius-lg);padding:1.8rem;text-align:center;
+  transition:var(--t);
+}
+.stat-box:hover{border-color:rgba(232,93,4,.3);transform:translateY(-4px);}
+.stat-box .ico{font-size:2rem;margin-bottom:.7rem;}
+.stat-box .val{
+  font-size:2rem;font-weight:900;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-box .lbl{font-size:.82rem;color:var(--muted);margin-top:.3rem;}
+
+/* خدمات */
+.section{padding:4rem 2rem;max-width:1100px;margin:0 auto;}
+.section-title{text-align:center;margin-bottom:3rem;}
+.section-title h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:900;}
+.section-title h2 span{color:var(--orange);}
+.section-title p{color:var(--muted);margin-top:.5rem;}
+
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem;}
+.service-card{
+  background:var(--dark2);border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius-lg);padding:2rem 1.5rem;text-align:center;
+  transition:var(--t);cursor:default;
+}
+.service-card:hover{border-color:rgba(232,93,4,.3);transform:translateY(-5px);box-shadow:var(--shadow);}
+.service-card .s-ico{font-size:2.5rem;margin-bottom:1rem;}
+.service-card h3{font-size:1rem;font-weight:700;margin-bottom:.5rem;}
+.service-card p{font-size:.84rem;color:var(--muted);}
+
+/* ===== درباره ما ===== */
+.about-hero{
+  padding:5rem 2rem 3rem;
+  background:radial-gradient(ellipse 60% 50% at 30% 40%,rgba(232,93,4,.08) 0%,transparent 70%);
+}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;max-width:1000px;margin:0 auto;}
+.about-img{
+  border-radius:var(--radius-xl);overflow:hidden;
+  box-shadow:var(--shadow),0 0 60px rgba(232,93,4,.15);
+  border:2px solid rgba(232,93,4,.2);
+}
+.about-img img{width:100%;display:block;}
+.about-text h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;margin-bottom:1rem;}
+.about-text h2 span{color:var(--orange);}
+.about-text p{color:var(--muted);line-height:1.9;margin-bottom:1rem;}
+.about-tags{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.2rem;}
+.tag{
+  padding:.4rem 1rem;border-radius:50px;font-size:.8rem;font-weight:700;
+  background:rgba(232,93,4,.1);border:1px solid rgba(232,93,4,.25);color:var(--orange);
+}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.2rem;}
+.team-card{
+  background:var(--dark2);border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius-lg);padding:2rem;text-align:center;transition:var(--t);
+}
+.team-card:hover{border-color:rgba(232,93,4,.3);}
+.team-card .av{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;margin:0 auto 1rem;
+}
+.team-card h4{font-weight:700;margin-bottom:.3rem;}
+.team-card p{font-size:.82rem;color:var(--muted);}
+
+/* ===== داشبورد مشترک ===== */
+.dash-wrap{padding:1.5rem 2rem 3rem;max-width:1200px;margin:0 auto;}
+.dash-header{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+  margin-bottom:2rem;padding-bottom:1.5rem;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.dash-header h2{font-size:1.5rem;font-weight:800;}
+.dash-header h2 span{color:var(--orange);}
+
+/* تب‌ها */
+.tabs{display:flex;gap:.4rem;margin-bottom:2rem;flex-wrap:wrap;}
+.tab{
+  padding:.65rem 1.3rem;border:none;border-radius:50px;
+  background:var(--dark3);color:var(--muted);font-family:var(--font);
+  font-size:.88rem;font-weight:600;cursor:pointer;transition:var(--t);
+}
+.tab:hover{color:var(--white);background:#3a3a3f;}
+.tab.active{background:var(--orange);color:#fff;box-shadow:var(--glow);}
+
+.tab-panel{display:none;animation:fadeUp .3s ease both;}
+.tab-panel.active{display:block;}
+
+/* کارت‌های آمار طراح */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:2rem;}
+.kpi{
+  background:var(--dark2);border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius-lg);padding:1.4rem;text-align:center;transition:var(--t);
+}
+.kpi:hover{border-color:rgba(232,93,4,.3);}
+.kpi .ico{font-size:1.6rem;margin-bottom:.5rem;}
+.kpi .v{
+  font-size:1.6rem;font-weight:900;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.kpi .l{font-size:.78rem;color:var(--muted);margin-top:.25rem;}
+
+/* گرید طرح‌ها */
+.designs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.2rem;}
+.design-card{
+  background:var(--dark2);border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius-lg);overflow:hidden;
+  transition:transform var(--t),box-shadow var(--t),border-color var(--t);
+}
+.design-card:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:rgba(232,93,4,.3);}
+.dc-img{
+  height:160px;background:var(--dark3);
+  display:flex;align-items:center;justify-content:center;font-size:3rem;
+  position:relative;overflow:hidden;
+}
+.dc-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(28,28,30,.6) 100%);}
+.dc-badge{
+  position:absolute;top:10px;right:10px;z-index:1;
+  padding:.25rem .7rem;border-radius:50px;font-size:.72rem;font-weight:700;
+  background:rgba(28,28,30,.8);backdrop-filter:blur(6px);
+  color:var(--orange);border:1px solid rgba(232,93,4,.3);
+}
+.dc-body{padding:1.1rem;}
+.dc-name{font-weight:700;margin-bottom:.4rem;}
+.dc-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+.dc-price{font-size:1.05rem;font-weight:800;color:var(--orange);}
+.dc-price .u{font-size:.75rem;font-weight:400;color:var(--muted);}
+.dc-actions{display:flex;gap:.5rem;}
+.dc-actions button{flex:1;}
+
+/* فرم */
+.form-panel{background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-xl);padding:2rem;}
+.form-group{margin-bottom:1.1rem;}
+.form-group label{display:block;font-size:.83rem;font-weight:600;color:var(--muted);margin-bottom:.45rem;}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:.8rem 1rem;
+  background:var(--dark3);border:1.5px solid rgba(255,255,255,.08);
+  border-radius:var(--radius);color:var(--white);font-family:var(--font);font-size:.93rem;
+  transition:border-color var(--t);outline:none;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--orange);}
+.form-group select{appearance:none;cursor:pointer;}
+.form-group textarea{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+
+/* نمودار CSS */
+.chart-wrap{display:flex;align-items:flex-end;gap:.5rem;height:130px;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:.8rem;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--orange),var(--orange2));min-height:4px;transition:height .9s cubic-bezier(.4,0,.2,1);position:relative;}
+.bar-fill::after{content:attr(data-v);position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:.68rem;font-weight:700;color:var(--orange);white-space:nowrap;}
+.bar-lbl{font-size:.68rem;color:var(--muted);}
+
+/* بنر تخفیف */
+.disc-banner{
+  background:linear-gradient(135deg,rgba(232,93,4,.12),rgba(244,140,6,.08));
+  border:1px solid rgba(232,93,4,.3);border-radius:var(--radius-lg);
+  padding:1.2rem 1.6rem;margin-bottom:2rem;
+  display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+}
+.disc-banner .d-ico{font-size:1.8rem;animation:pulse-o 1.8s ease infinite;}
+.disc-banner h3{color:var(--orange);margin-bottom:.2rem;}
+.disc-tiers{display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap;}
+.dt{padding:.3rem .8rem;border-radius:50px;font-size:.78rem;font-weight:700;background:rgba(232,93,4,.08);border:1px solid rgba(232,93,4,.2);color:var(--orange);}
+.dt.hit{background:var(--orange);color:#fff;border-color:transparent;}
+
+/* سبد خرید - اوورلی */
+.cart-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:none;align-items:flex-start;justify-content:flex-start;}
+.cart-overlay.open{display:flex;animation:fadeIn .2s ease;}
+.cart-panel{
+  width:400px;max-width:100vw;height:100vh;overflow-y:auto;
+  background:rgba(28,28,30,.95);backdrop-filter:blur(24px);
+  border-left:1px solid rgba(232,93,4,.2);padding:1.5rem;
+  animation:slideL .3s cubic-bezier(.4,0,.2,1);
+}
+.cart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(232,93,4,.15);}
+.cart-hdr h3{font-size:1.1rem;}
+.close-btn{width:34px;height:34px;border:none;background:var(--dark3);border-radius:50%;color:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t);}
+.close-btn:hover{background:rgba(232,93,4,.15);color:var(--orange);}
+.cart-item{display:flex;align-items:center;gap:.9rem;padding:.9rem;background:var(--dark3);border-radius:var(--radius);margin-bottom:.6rem;border:1px solid rgba(255,255,255,.05);}
+.ci-icon{width:46px;height:46px;border-radius:10px;background:var(--dark2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.ci-info{flex:1;}
+.ci-name{font-weight:600;font-size:.92rem;}
+.ci-price{color:var(--orange);font-size:.85rem;font-weight:700;margin-top:.2rem;}
+.ci-rm{background:none;border:none;color:#ef4444;cursor:pointer;font-size:.95rem;padding:.2rem;transition:var(--t);}
+.ci-rm:hover{transform:scale(1.2);}
+.cart-summary{background:var(--dark3);border-radius:var(--radius);padding:1.1rem;margin:1rem 0;}
+.s-row{display:flex;justify-content:space-between;align-items:center;font-size:.88rem;margin-bottom:.5rem;}
+.s-row:last-child{margin-bottom:0;}
+.s-row.total{font-size:1rem;font-weight:800;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.07);}
+.s-row.disc{color:#4ade80;font-weight:700;}
+.disc-pill{display:inline-block;padding:.15rem .55rem;background:rgba(74,222,128,.1);border-radius:50px;font-size:.72rem;border:1px solid rgba(74,222,128,.25);}
+.cart-empty{text-align:center;padding:3rem 1rem;}
+.cart-empty .e-ico{font-size:3rem;margin-bottom:1rem;}
+
+/* موال */
+.modal-ov{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-ov.open{display:flex;animation:fadeIn .2s ease;}
+.modal{background:var(--dark2);border:1px solid rgba(232,93,4,.2);border-radius:var(--radius-xl);padding:2rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:scaleIn .3s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow);}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.07);}
+.modal-hdr h3{font-size:1.1rem;font-weight:800;}
+
+/* توست */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dark2);border:1px solid rgba(232,93,4,.3);border-radius:var(--radius);padding:.9rem 1.4rem;display:flex;align-items:center;gap:.65rem;font-weight:600;z-index:9999;transition:transform .4s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow);white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* سفارش‌ها */
+.order-item{background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);padding:1.2rem;margin-bottom:.9rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;}
+.oi-info h4{font-weight:700;margin-bottom:.3rem;}
+.oi-info p{font-size:.82rem;color:var(--muted);}
+.oi-price{font-size:1.1rem;font-weight:800;color:var(--orange);}
+.badge{display:inline-block;padding:.25rem .7rem;border-radius:50px;font-size:.75rem;font-weight:700;}
+.badge-o{background:rgba(232,93,4,.1);color:var(--orange);border:1px solid rgba(232,93,4,.25);}
+.badge-g{background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.25);}
+
+/* تگ ورود */
+.login-wall{text-align:center;padding:5rem 2rem;}
+.login-wall .lw-ico{font-size:3.5rem;margin-bottom:1rem;}
+.login-wall h2{font-size:1.5rem;font-weight:800;margin-bottom:.5rem;}
+.login-wall p{color:var(--muted);margin-bottom:1.5rem;}
+
+/* خط جدا */
+.sep{border:none;border-top:1px solid rgba(255,255,255,.07);margin:1.5rem 0;}
+
+/* ریسپانسیو */
+@media(max-width:768px){nav{padding:.8rem 1rem;}.about-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.hero{padding:5rem 1rem 2rem;}}
+
+/* انیمیشن */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);}}
+@keyframes slideL{from{transform:translateX(-50px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes pulse-o{0%,100%{filter:drop-shadow(0 0 4px rgba(232,93,4,.4));}50%{filter:drop-shadow(0 0 12px rgba(232,93,4,.9));}}
+</style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <div class="logo">🎨 بازارچه طراحی چاپ</div>
-        <div id="authSection"><button onclick="showLoginModal()">ورود / ثبت‌نام</button></div>
+
+<!-- ناوبار -->
+<nav id="main-nav">
+  <a class="nav-logo" href="#" onclick="showPage('home');return false;">
+    <img id="nav-logo-img" src="LOGO_PLACEHOLDER" alt="Nash Team" />
+  </a>
+  <div class="nav-links" id="nav-links">
+    <button class="nav-btn active" onclick="showPage('home')">🏠 خانه</button>
+    <button class="nav-btn" onclick="showPage('about')">👥 درباره ما</button>
+    <button class="nav-btn" onclick="showPage('market')">🎨 بازارچه</button>
+    <button class="nav-btn" onclick="showPage('dashboard')">📊 داشبورد</button>
+    <div id="nav-auth-area">
+      <button class="btn-cta" onclick="openLoginModal()"><i class="fa fa-sign-in-alt"></i> ورود</button>
     </div>
-    <div id="mainContent"><div class="message">لطفاً وارد شوید.</div></div>
+  </div>
+</nav>
+
+<!-- ======= صفحه خانه ======= -->
+<section id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">✨ بازارچه تخصصی طراحی و چاپ</div>
+      <h1>طراحی حرفه‌ای،<br/><span>چاپ فوق‌العاده</span></h1>
+      <p>پلتفرم Nash Team محل اتصال بهترین طراحان و چاپخانه‌های حرفه‌ای کشور است.<br/>طرح بخرید، طرح بفروشید، با تخفیف ویژه ماهانه.</p>
+      <div class="hero-btns">
+        <button class="btn btn-primary" onclick="showPage('market')"><i class="fa fa-store"></i> ورود به بازارچه</button>
+        <button class="btn btn-secondary" onclick="showPage('about')"><i class="fa fa-info-circle"></i> بیشتر بدانید</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- آمار -->
+  <div class="home-stats">
+    <div class="stat-box"><div class="ico">🎨</div><div class="val" id="hs-designs">0</div><div class="lbl">طرح فعال</div></div>
+    <div class="stat-box"><div class="ico">🖨</div><div class="val" id="hs-printers">0</div><div class="lbl">چاپخانه عضو</div></div>
+    <div class="stat-box"><div class="ico">✏️</div><div class="val" id="hs-designers">0</div><div class="lbl">طراح حرفه‌ای</div></div>
+    <div class="stat-box"><div class="ico">📦</div><div class="val" id="hs-orders">0</div><div class="lbl">سفارش ثبت‌شده</div></div>
+  </div>
+
+  <!-- خدمات -->
+  <div class="section">
+    <div class="section-title"><h2>چرا <span>Nash Team</span>؟</h2><p>ما بهترین تجربه را برای طراحان و چاپخانه‌ها فراهم می‌کنیم</p></div>
+    <div class="services-grid">
+      <div class="service-card"><div class="s-ico">⚡</div><h3>سرعت بالا</h3><p>دسترسی فوری به صدها طرح آماده برای چاپ</p></div>
+      <div class="service-card"><div class="s-ico">💰</div><h3>تخفیف ماهانه</h3><p>تا ۷۰٪ تخفیف با خرید ماهانه بیشتر</p></div>
+      <div class="service-card"><div class="s-ico">🎨</div><h3>طراحی حرفه‌ای</h3><p>طرح‌های با کیفیت از بهترین طراحان ایران</p></div>
+      <div class="service-card"><div class="s-ico">🔒</div><h3>امنیت کامل</h3><p>پرداخت و مدیریت سفارش با بالاترین امنیت</p></div>
+      <div class="service-card"><div class="s-ico">📱</div><h3>واکنش‌گرا</h3><p>استفاده آسان در موبایل، تبلت و دسکتاپ</p></div>
+      <div class="service-card"><div class="s-ico">📊</div><h3>آمار دقیق</h3><p>آمار کامل فروش و سفارش‌ها برای طراحان</p></div>
+    </div>
+  </div>
+
+  <!-- انواع طرح -->
+  <div class="section" style="padding-top:0;">
+    <div class="section-title"><h2>انواع <span>طرح‌ها</span></h2><p>انواع محصولات چاپی موجود در بازارچه</p></div>
+    <div class="services-grid">
+      <div class="service-card" onclick="showPage('market')" style="cursor:pointer;"><div class="s-ico">🏷</div><h3>بنر و فلکس</h3><p>طرح‌های آماده بنر در ابعاد مختلف</p></div>
+      <div class="service-card" onclick="showPage('market')" style="cursor:pointer;"><div class="s-ico">💼</div><h3>کارت ویزیت</h3><p>طرح‌های خلاقانه و مدرن</p></div>
+      <div class="service-card" onclick="showPage('market')" style="cursor:pointer;"><div class="s-ico">📄</div><h3>بروشور و کاتالوگ</h3><p>طرح‌های دو و سه لت</p></div>
+      <div class="service-card" onclick="showPage('market')" style="cursor:pointer;"><div class="s-ico">🖼</div><h3>پوستر و تراکت</h3><p>طرح‌های تبلیغاتی چشم‌نواز</p></div>
+    </div>
+  </div>
+
+  <footer style="text-align:center;padding:2rem;border-top:1px solid rgba(232,93,4,.1);color:var(--muted);font-size:.85rem;">
+    <strong style="color:var(--orange);">Nash Team</strong> | Design &amp; Print Studio — تمامی حقوق محفوظ است ©۱۴۰۴
+  </footer>
+</section>
+
+<!-- ======= صفحه درباره ما ======= -->
+<section id="page-about" class="page">
+  <div class="about-hero">
+    <div class="about-grid">
+      <div class="about-img">
+        <img id="about-logo-img" src="LOGO_PLACEHOLDER" alt="Nash Team" />
+      </div>
+      <div class="about-text">
+        <h2>ما <span>Nash Team</span> هستیم</h2>
+        <p>Nash Team یک استودیوی تخصصی طراحی و چاپ است که از سال ۱۴۰۰ با هدف اتصال طراحان حرفه‌ای به چاپخانه‌های سراسر کشور فعالیت می‌کند.</p>
+        <p>ما باور داریم که یک طرح خوب، تجربه چاپ را متحول می‌کند. پلتفرم ما محلی امن برای خرید و فروش طرح‌های با کیفیت است.</p>
+        <p>با بیش از ۵۰۰ طرح فعال، ۲۰۰+ چاپخانه عضو و هزاران سفارش ثبت‌شده، Nash Team بزرگترین بازارچه تخصصی چاپ ایران است.</p>
+        <div class="about-tags">
+          <span class="tag">طراحی گرافیک</span><span class="tag">چاپ دیجیتال</span>
+          <span class="tag">فلکسوگرافی</span><span class="tag">لیبل</span>
+          <span class="tag">بسته‌بندی</span><span class="tag">پوستر</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><h2>تیم <span>ما</span></h2><p>متخصصانی که پشت Nash Team ایستاده‌اند</p></div>
+    <div class="team-grid">
+      <div class="team-card"><div class="av">👨‍🎨</div><h4>علی رضایی</h4><p>مدیر ارشد و طراح اصلی</p></div>
+      <div class="team-card"><div class="av">👩‍💻</div><h4>سارا احمدی</h4><p>توسعه‌دهنده و UX</p></div>
+      <div class="team-card"><div class="av">👨‍💼</div><h4>رضا محمدی</h4><p>مدیر ارتباط با چاپخانه‌ها</p></div>
+      <div class="team-card"><div class="av">👩‍🎨</div><h4>نیلوفر کریمی</h4><p>طراح برند و هویت بصری</p></div>
+    </div>
+  </div>
+
+  <!-- ارزش‌ها -->
+  <div class="section" style="padding-top:0;">
+    <div class="section-title"><h2>ارزش‌های <span>ما</span></h2></div>
+    <div class="services-grid">
+      <div class="service-card"><div class="s-ico">🤝</div><h3>اعتماد</h3><p>روابط بلندمدت بر پایه صداقت و شفافیت</p></div>
+      <div class="service-card"><div class="s-ico">🌟</div><h3>کیفیت</h3><p>بالاترین استانداردها در طراحی و چاپ</p></div>
+      <div class="service-card"><div class="s-ico">🚀</div><h3>نوآوری</h3><p>همیشه به‌روز با جدیدترین تکنولوژی‌ها</p></div>
+    </div>
+  </div>
+
+  <footer style="text-align:center;padding:2rem;border-top:1px solid rgba(232,93,4,.1);color:var(--muted);font-size:.85rem;">
+    <strong style="color:var(--orange);">Nash Team</strong> | Design &amp; Print Studio — تمامی حقوق محفوظ است ©۱۴۰۴
+  </footer>
+</section>
+
+<!-- ======= بازارچه (عمومی) ======= -->
+<section id="page-market" class="page">
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.3rem;">بازارچه طراحی</div><h2>طرح‌های <span>موجود</span></h2></div>
+      <div id="market-cart-btn" style="display:none;">
+        <button class="btn btn-primary btn-sm" onclick="openCart()"><i class="fa fa-shopping-cart"></i> سبد (<span id="mkt-cart-cnt">0</span>)</button>
+      </div>
+    </div>
+
+    <!-- فیلتر -->
+    <div class="tabs" id="market-filter-tabs">
+      <button class="tab active" onclick="filterMarket('همه')">همه</button>
+      <button class="tab" onclick="filterMarket('بنر')">🏷 بنر</button>
+      <button class="tab" onclick="filterMarket('کارت ویزیت')">💼 کارت ویزیت</button>
+      <button class="tab" onclick="filterMarket('پوستر')">🖼 پوستر</button>
+      <button class="tab" onclick="filterMarket('بروشور')">📄 بروشور</button>
+      <button class="tab" onclick="filterMarket('لوگو')">✨ لوگو</button>
+    </div>
+
+    <div id="market-login-wall" style="display:none;">
+      <div class="login-wall"><div class="lw-ico">🔐</div><h2>برای خرید وارد شوید</h2><p>به عنوان چاپخانه وارد شوید تا بتوانید طرح خریداری کنید</p><button class="btn btn-primary" onclick="openLoginModal()">ورود / ثبت‌نام</button></div>
+    </div>
+
+    <div class="designs-grid" id="market-grid"></div>
+  </div>
+  <footer style="text-align:center;padding:2rem;border-top:1px solid rgba(232,93,4,.1);color:var(--muted);font-size:.85rem;"><strong style="color:var(--orange);">Nash Team</strong> — بازارچه طراحی چاپ</footer>
+</section>
+
+<!-- ======= داشبورد ======= -->
+<section id="page-dashboard" class="page">
+  <div class="dash-wrap">
+    <!-- حالت لاگین نشده -->
+    <div id="dash-login-wall">
+      <div class="login-wall"><div class="lw-ico">📊</div><h2>داشبورد شما</h2><p>برای دسترسی به داشبورد وارد شوید</p><button class="btn btn-primary" onclick="openLoginModal()">ورود / ثبت‌نام</button></div>
+    </div>
+    <!-- داشبورد طراح -->
+    <div id="dash-designer" style="display:none;">
+      <div class="dash-header">
+        <div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.3rem;">🎨 داشبورد طراح</div><h2>خوش آمدید <span id="ds-username"></span></h2></div>
+        <button class="btn btn-outline btn-sm" onclick="openAddDesignModal()"><i class="fa fa-plus"></i> طرح جدید</button>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="dTab('overview')">📊 آمار</button>
+        <button class="tab" onclick="dTab('mydesigns')">🎨 طرح‌های من</button>
+        <button class="tab" onclick="dTab('adddesign')">➕ افزودن</button>
+        <button class="tab" onclick="dTab('dsales')">💰 فروش</button>
+      </div>
+      <div id="dt-overview" class="tab-panel active">
+        <div class="kpi-grid" id="ds-kpi"></div>
+        <div style="background:var(--dark2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-xl);padding:1.5rem;">
+          <h3 style="margin-bottom:1rem;">📈 نمودار فروش ماهانه</h3>
+          <div class="chart-wrap" id="ds-chart"></div>
+        </div>
+      </div>
+      <div id="dt-mydesigns" class="tab-panel">
+        <div class="designs-grid" id="ds-my-grid"></div>
+      </div>
+      <div id="dt-adddesign" class="tab-panel">
+        <div class="form-panel" style="max-width:560px;">
+          <h3 style="margin-bottom:1.5rem;">🎨 افزودن طرح جدید</h3>
+          <div class="form-group"><label>نام طرح</label><input id="fn-name" placeholder="مثلاً: طرح بهاره با کیفیت بالا"/></div>
+          <div class="form-row">
+            <div class="form-group"><label>نوع</label><select id="fn-type"><option>بنر</option><option>کارت ویزیت</option><option>بروشور</option><option>پوستر</option><option>لوگو</option><option>سربرگ</option><option>استیکر</option><option>تراکت</option></select></div>
+            <div class="form-group"><label>قیمت (تومان)</label><input id="fn-price" type="number" placeholder="150000" min="0"/></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>آیکون</label><input id="fn-icon" placeholder="🎨" maxlength="4"/></div>
+            <div class="form-group"><label>توضیحات (اختیاری)</label><input id="fn-desc" placeholder="توضیح کوتاه..."/></div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="doAddDesign()"><i class="fa fa-plus-circle"></i> ثبت طرح</button>
+        </div>
+      </div>
+      <div id="dt-dsales" class="tab-panel">
+        <div id="ds-sales-list"></div>
+      </div>
+    </div>
+    <!-- داشبورد چاپخانه -->
+    <div id="dash-printer" style="display:none;">
+      <div class="dash-header">
+        <div><div style="font-size:.8rem;color:var(--muted);margin-bottom:.3rem;">🖨 داشبورد چاپخانه</div><h2>خوش آمدید <span id="pr-username"></span></h2></div>
+        <button class="btn btn-primary btn-sm" onclick="openCart()"><i class="fa fa-shopping-cart"></i> سبد (<span id="pr-cart-cnt">0</span>)</button>
+      </div>
+      <div class="disc-banner">
+        <div class="d-ico">⚡</div>
+        <div><h3>تخفیف ویژه ماهانه</h3><p style="font-size:.83rem;color:var(--muted);margin-top:.2rem;">هر چه بیشتر بخری، بیشتر صرفه‌جویی کنی!</p>
+          <div class="disc-tiers"><span class="dt" id="dt4">۴ طرح ← ۵۰٪</span><span class="dt" id="dt8">۸ طرح ← ۶۰٪</span><span class="dt" id="dt10">۱۰ طرح ← ۷۰٪</span></div>
+        </div>
+        <div style="margin-right:auto;text-align:center;">
+          <div style="font-size:2rem;font-weight:900;color:var(--orange);" id="pr-disc-val">۰٪</div>
+          <div style="font-size:.78rem;color:var(--muted);">تخفیف فعلی</div>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="pTab('shop')">🛍 فروشگاه</button>
+        <button class="tab" onclick="pTab('cart')">🛒 سبد خرید</button>
+        <button class="tab" onclick="pTab('orders')">📦 سفارشات</button>
+      </div>
+      <div id="pt-shop" class="tab-panel active"><div class="designs-grid" id="pr-shop-grid"></div></div>
+      <div id="pt-cart" class="tab-panel"><div id="pr-cart-inline"></div></div>
+      <div id="pt-orders" class="tab-panel"><div id="pr-orders-list"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- سبد خرید پاپ‌آپ -->
+<div class="cart-overlay" id="cart-overlay" onclick="cartBgClick(event)">
+  <div class="cart-panel">
+    <div class="cart-hdr"><h3>🛒 سبد خرید ماهانه</h3><button class="close-btn" onclick="closeCart()"><i class="fa fa-times"></i></button></div>
+    <div id="cart-items"></div>
+    <div id="cart-sum"></div>
+    <div id="cart-empty-msg" class="cart-empty"><div class="e-ico">🛒</div><p style="color:var(--muted);">سبد خالی است</p></div>
+    <button class="btn btn-primary btn-full" id="btn-checkout" style="display:none;" onclick="doCheckout()"><i class="fa fa-check-circle"></i> ثبت سفارش ✨</button>
+  </div>
 </div>
 
-<div id="authModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
-    <div style="background:white; padding:30px; border-radius:30px; width:90%; max-width:400px;">
-        <h3>ورود / ثبت‌نام</h3>
-        <input type="email" id="authEmail" placeholder="ایمیل">
-        <input type="text" id="authName" placeholder="نام کامل">
-        <select id="authRole"><option value="designer">طراح</option><option value="printer">چاپخانه</option></select>
-        <button onclick="auth()" style="width:100%;">ادامه</button>
-        <button onclick="closeModal()" style="background:#ccc; width:100%; margin-top:5px;">بستن</button>
+<!-- موال ورود -->
+<div class="modal-ov" id="modal-login">
+  <div class="modal">
+    <div class="modal-hdr"><h3>ورود / ثبت‌نام</h3><button class="close-btn" onclick="closeModal('modal-login')"><i class="fa fa-times"></i></button></div>
+    <div class="tabs" style="margin-bottom:1.2rem;">
+      <button class="tab active" onclick="setRole('printer')">🖨 چاپخانه</button>
+      <button class="tab" onclick="setRole('designer')">🎨 طراح</button>
     </div>
+    <div class="form-group"><label>ایمیل</label><input id="l-email" type="email" placeholder="example@email.com"/></div>
+    <div class="form-group"><label>نام کامل</label><input id="l-name" placeholder="نام و نام خانوادگی"/></div>
+    <div class="form-group"><label>رمز عبور (نمایشی)</label><input id="l-pass" type="password" placeholder="••••••••"/></div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()"><i class="fa fa-sign-in-alt"></i> ورود به پلتفرم</button>
+    <p style="text-align:center;font-size:.8rem;color:var(--muted);margin-top:1rem;">برای دمو فقط ایمیل و نام وارد کنید ✨</p>
+  </div>
 </div>
+
+<!-- موال ویرایش طرح -->
+<div class="modal-ov" id="modal-edit">
+  <div class="modal">
+    <div class="modal-hdr"><h3>✏️ ویرایش طرح</h3><button class="close-btn" onclick="closeModal('modal-edit')"><i class="fa fa-times"></i></button></div>
+    <input type="hidden" id="edit-id"/>
+    <div class="form-group"><label>نام</label><input id="edit-name"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>نوع</label><select id="edit-type"><option>بنر</option><option>کارت ویزیت</option><option>بروشور</option><option>پوستر</option><option>لوگو</option><option>سربرگ</option><option>استیکر</option><option>تراکت</option></select></div>
+      <div class="form-group"><label>قیمت</label><input id="edit-price" type="number" min="0"/></div>
+    </div>
+    <div class="form-group"><label>آیکون</label><input id="edit-icon" maxlength="4"/></div>
+    <button class="btn btn-primary btn-full" onclick="doSaveEdit()"><i class="fa fa-save"></i> ذخیره</button>
+  </div>
+</div>
+
+<!-- موال افزودن طرح (از هدر) -->
+<div class="modal-ov" id="modal-add">
+  <div class="modal">
+    <div class="modal-hdr"><h3>🎨 طرح جدید</h3><button class="close-btn" onclick="closeModal('modal-add')"><i class="fa fa-times"></i></button></div>
+    <div class="form-group"><label>نام</label><input id="ma-name" placeholder="نام طرح"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>نوع</label><select id="ma-type"><option>بنر</option><option>کارت ویزیت</option><option>بروشور</option><option>پوستر</option><option>لوگو</option><option>سربرگ</option><option>استیکر</option><option>تراکت</option></select></div>
+      <div class="form-group"><label>قیمت (تومان)</label><input id="ma-price" type="number" min="0"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>آیکون</label><input id="ma-icon" placeholder="🎨" maxlength="4"/></div>
+      <div class="form-group"><label>توضیحات</label><input id="ma-desc"/></div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doAddFromModal()"><i class="fa fa-plus-circle"></i> ثبت</button>
+  </div>
+</div>
+
+<!-- توست -->
+<div class="toast" id="toast"><span id="t-ico">✅</span><span id="t-msg">پیام</span></div>
 
 <script>
-    // ========== فقط اين دو خط را عوض كنيد ==========
-    const SUPABASE_URL = "https://epiuybbwgqhysldtondp.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_KlWaQVH7wrdshtr4CNJiHA_0ebE-JO6";
-    // ============================================
+/* ===================== Supabase ===================== */
+const SUPABASE_URL      = 'https://epiuybbwgqhysldtondp.supabase.co'; // با اطلاعات پروژه Supabase خودت پر کن
+const SUPABASE_ANON_KEY = 'sb_publishable_KlWaQVH7wrdshtr4CNJiHA_0ebE-JO6'; // با اطلاعات پروژه Supabase خودت پر کن
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let currentUser = null;
+/* ===================== وضعیت ===================== */
+let currentUser = null;
+let loginRole   = 'printer';
+let allDesigns  = [];
+let marketFilter = 'همه';
 
-    function showLoginModal() { document.getElementById("authModal").style.display = "flex"; }
-    function closeModal() { document.getElementById("authModal").style.display = "none"; }
+/* ===================== localStorage ===================== */
+const monthKey = () => { const d=new Date(); return `cart_${d.getFullYear()}_${d.getMonth()+1}`; };
+const getCart  = () => JSON.parse(localStorage.getItem(monthKey()) || '[]');
+const saveCart = c => localStorage.setItem(monthKey(), JSON.stringify(c));
+const getUsers    = () => JSON.parse(localStorage.getItem('nt_users')    || '[]');
+const getDesigns  = () => JSON.parse(localStorage.getItem('nt_designs')  || '[]');
+const getOrders   = () => JSON.parse(localStorage.getItem('nt_orders')   || '[]');
+const getOItems   = () => JSON.parse(localStorage.getItem('nt_oitems')   || '[]');
+const saveUsers   = v => localStorage.setItem('nt_users',   JSON.stringify(v));
+const saveDesigns = v => localStorage.setItem('nt_designs', JSON.stringify(v));
+const saveOrders  = v => localStorage.setItem('nt_orders',  JSON.stringify(v));
+const saveOItems  = v => localStorage.setItem('nt_oitems',  JSON.stringify(v));
 
-    async function auth() {
-        const email = document.getElementById("authEmail").value;
-        const name = document.getElementById("authName").value;
-        const role = document.getElementById("authRole").value;
-        if (!email || !name) { alert("ایمیل و نام لازم است"); return; }
-        
-        let { data: existing } = await supabase.from('users').select('*').eq('email', email).single();
-        if (existing) {
-            currentUser = existing;
-        } else {
-            let { data: newUser, error } = await supabase.from('users').insert([{ email, full_name: name, role }]).select().single();
-            if (error) { alert("خطا: " + error.message); return; }
-            currentUser = newUser;
-        }
-        closeModal();
-        renderDashboard();
-    }
+/* مقداردهی اولیه */
+function initData(){
+  if(!getUsers().length){
+    saveUsers([
+      {id:'u1',email:'designer@nash.ir',full_name:'علی رضایی',role:'designer',created_at:new Date().toISOString()},
+      {id:'u2',email:'printer@nash.ir',full_name:'سارا احمدی',role:'printer',created_at:new Date().toISOString()}
+    ]);
+  }
+  if(!getDesigns().length){
+    saveDesigns([
+      {id:'d1',designer_id:'u1',name:'بنر عید نوروز',type:'بنر',price:120000,icon:'🎋',sales:14,created_at:new Date().toISOString()},
+      {id:'d2',designer_id:'u1',name:'کارت ویزیت مدرن',type:'کارت ویزیت',price:85000,icon:'💼',sales:22,created_at:new Date().toISOString()},
+      {id:'d3',designer_id:'u1',name:'پوستر محصول',type:'پوستر',price:150000,icon:'🖼',sales:8,created_at:new Date().toISOString()},
+      {id:'d4',designer_id:'u1',name:'لوگو مینیمال',type:'لوگو',price:200000,icon:'✨',sales:17,created_at:new Date().toISOString()},
+      {id:'d5',designer_id:'u1',name:'بروشور تابستانه',type:'بروشور',price:95000,icon:'📄',sales:11,created_at:new Date().toISOString()},
+      {id:'d6',designer_id:'u1',name:'استیکر سفارشی',type:'استیکر',price:60000,icon:'🏷',sales:30,created_at:new Date().toISOString()},
+      {id:'d7',designer_id:'u1',name:'سربرگ رسمی',type:'سربرگ',price:75000,icon:'📋',sales:9,created_at:new Date().toISOString()},
+      {id:'d8',designer_id:'u1',name:'تراکت تبلیغاتی',type:'تراکت',price:55000,icon:'📢',sales:25,created_at:new Date().toISOString()},
+    ]);
+  }
+}
 
-    function logout() { currentUser = null; renderDashboard(); }
+/* ===================== ناوبری ===================== */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map={home:0,about:1,market:2,dashboard:3};
+  document.querySelectorAll('.nav-btn')[map[name]]?.classList.add('active');
+  if(name==='market')   renderMarket();
+  if(name==='dashboard') renderDashboard();
+  if(name==='home')      updateHomeStats();
+}
 
-    async function renderDashboard() {
-        const main = document.getElementById("mainContent");
-        if (!currentUser) {
-            main.innerHTML = `<div class="message">لطفاً وارد شوید.</div>`;
-            document.getElementById("authSection").innerHTML = `<button onclick="showLoginModal()">ورود / ثبت‌نام</button>`;
-            return;
-        }
-        document.getElementById("authSection").innerHTML = `<span>${currentUser.full_name} (${currentUser.role === 'designer' ? 'طراح' : 'چاپخانه'})</span> <button class="logout-btn" onclick="logout()">خروج</button>`;
-        
-        if (currentUser.role === 'designer') {
-            await designerDashboard();
-        } else {
-            await printerDashboard();
-        }
-    }
+/* ===================== آمار خانه ===================== */
+function updateHomeStats(){
+  const d=getDesigns(), u=getUsers(), o=getOrders();
+  animCount('hs-designs',d.length);
+  animCount('hs-printers', u.filter(u=>u.role==='printer').length||2);
+  animCount('hs-designers',u.filter(u=>u.role==='designer').length||1);
+  animCount('hs-orders',o.length);
+}
+function animCount(id, target){
+  const el=document.getElementById(id); if(!el) return;
+  let cur=0; const step=Math.ceil(target/30);
+  const iv=setInterval(()=>{ cur=Math.min(cur+step,target); el.textContent=toP(cur); if(cur>=target)clearInterval(iv); },40);
+}
 
-    async function designerDashboard() {
-        let { data: myDesigns } = await supabase.from('designs').select('*').eq('designer_id', currentUser.id);
-        let { data: orderItems } = await supabase.from('order_items').select('*, orders(*), designs(*)');
-        let sales = orderItems?.filter(oi => oi.designs?.designer_id === currentUser.id) || [];
-        let revenue = sales.reduce((s,oi) => s + oi.price_at_purchase, 0);
-        
-        main.innerHTML = `
-            <div class="dashboard">
-                <div class="tabs">
-                    <button class="tab active" onclick="showDesignerList(${JSON.stringify(myDesigns).replace(/"/g,'&quot;')})">طرح‌های من</button>
-                    <button class="tab" onclick="showAddDesign()">افزودن طرح</button>
-                    <button class="tab" onclick="showDesignerStats(${sales.length},${revenue})">آمار فروش</button>
-                </div>
-                <div id="designerPanel"></div>
-            </div>`;
-        showDesignerList(myDesigns);
-    }
+/* ===================== ورود ===================== */
+function openLoginModal(){ openModal('modal-login'); }
+function setRole(r){
+  loginRole=r;
+  document.querySelectorAll('#modal-login .tab').forEach((t,i)=>t.classList.toggle('active',(r==='printer'&&i===0)||(r==='designer'&&i===1)));
+}
+function doLogin(){
+  const email=document.getElementById('l-email').value.trim();
+  const name=document.getElementById('l-name').value.trim()||'کاربر';
+  if(!email){toast('❗','لطفاً ایمیل وارد کنید');return;}
+  let users=getUsers();
+  let user=users.find(u=>u.email===email&&u.role===loginRole);
+  if(!user){ user={id:'u_'+Date.now(),email,full_name:name,role:loginRole,created_at:new Date().toISOString()}; users.push(user); saveUsers(users); }
+  currentUser=user;
+  closeModal('modal-login');
+  renderNav();
+  renderDashboard();
+  showPage('dashboard');
+  toast('✅',`خوش آمدید ${user.full_name} 🎉`);
+}
+function logout(){ currentUser=null; renderNav(); renderDashboard(); showPage('home'); toast('👋','خروج موفق'); }
 
-    window.showDesignerList = (designs) => {
-        if(!designs?.length) { document.getElementById("designerPanel").innerHTML = "<div class='message'>طرحی ندارید</div>"; return; }
-        let html = `<div class="grid">`;
-        designs.forEach(d => { html += `<div class="card"><h3>${d.name}</h3><p>${d.type}</p><div class="price">${d.price.toLocaleString()} تومان</div><button onclick="editDesign('${d.id}','${d.name}','${d.type}',${d.price})">ویرایش</button><button class="danger" onclick="deleteDesign('${d.id}')">حذف</button></div>`; });
-        html += `</div>`;
-        document.getElementById("designerPanel").innerHTML = html;
-    };
+/* ===================== ناو ===================== */
+function renderNav(){
+  const area=document.getElementById('nav-auth-area');
+  if(!currentUser){
+    area.innerHTML=`<button class="btn-cta" onclick="openLoginModal()"><i class="fa fa-sign-in-alt"></i> ورود</button>`;
+  } else {
+    area.innerHTML=`<div class="user-chip"><div class="av">${currentUser.full_name.charAt(0)}</div><span>${currentUser.full_name}</span></div><button class="nav-btn" onclick="logout()" style="color:#ef4444;"><i class="fa fa-sign-out-alt"></i> خروج</button>`;
+  }
+  // سبد در مارکت
+  const mcb=document.getElementById('market-cart-btn');
+  if(mcb) mcb.style.display=(currentUser&&currentUser.role==='printer')?'block':'none';
+}
 
-    window.showAddDesign = () => {
-        document.getElementById("designerPanel").innerHTML = `<div><input id="newName" placeholder="نام طرح"><input id="newType" placeholder="نوع (فلکسو، لیبل، جعبه)"><input id="newPrice" placeholder="قیمت به تومان"><button onclick="addDesign()">ذخیره</button></div>`;
-    };
+/* ===================== بازارچه ===================== */
+function filterMarket(f){
+  marketFilter=f;
+  document.querySelectorAll('#market-filter-tabs .tab').forEach(t=>t.classList.toggle('active',t.textContent.includes(f)||(f==='همه'&&t.textContent.includes('همه'))));
+  renderMarket();
+}
+function renderMarket(){
+  allDesigns=getDesigns();
+  const grid=document.getElementById('market-grid');
+  const wall=document.getElementById('market-login-wall');
+  let ds=marketFilter==='همه'?allDesigns:allDesigns.filter(d=>d.type===marketFilter);
+  if(!ds.length){grid.innerHTML='<p style="color:var(--muted);padding:2rem;">طرحی یافت نشد</p>';return;}
+  const cart=getCart();
+  grid.innerHTML=ds.map(d=>{
+    const inCart=cart.some(c=>c.id===d.id);
+    const isPrinter=currentUser&&currentUser.role==='printer';
+    return `<div class="design-card">
+      <div class="dc-img">${d.icon||'🎨'}<div class="dc-badge">${d.type}</div></div>
+      <div class="dc-body">
+        <div class="dc-name">${d.name}</div>
+        <div class="dc-meta"><div class="dc-price">${toP(Number(d.price).toLocaleString())} <span class="u">تومان</span></div><span style="font-size:.78rem;color:var(--muted);">فروش: ${toP(d.sales||0)}</span></div>
+        <div class="dc-actions">
+          ${isPrinter
+            ? (inCart?`<button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;" disabled>✅ در سبد</button>`
+                     :`<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="addToCart('${d.id}')"><i class="fa fa-cart-plus"></i> افزودن</button>`)
+            : `<button class="btn btn-outline btn-sm" style="flex:1;justify-content:center;" onclick="openLoginModal()"><i class="fa fa-lock"></i> ورود برای خرید</button>`
+          }
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // شمارنده
+  const cnt=document.getElementById('mkt-cart-cnt');
+  if(cnt) cnt.textContent=cart.length;
+}
 
-    window.addDesign = async () => {
-        let name = document.getElementById("newName").value;
-        let type = document.getElementById("newType").value;
-        let price = parseInt(document.getElementById("newPrice").value);
-        if(!name || !type || !price) { alert("لطفاً همه فیلدها را پر کنید"); return; }
-        let { error } = await supabase.from('designs').insert([{ designer_id: currentUser.id, name, type, price }]);
-        if(error) { alert("خطا: " + error.message); return; }
-        renderDashboard();
-    };
+/* ===================== داشبورد ===================== */
+function renderDashboard(){
+  document.getElementById('dash-login-wall').style.display=!currentUser?'block':'none';
+  document.getElementById('dash-designer').style.display=currentUser&&currentUser.role==='designer'?'block':'none';
+  document.getElementById('dash-printer').style.display=currentUser&&currentUser.role==='printer'?'block':'none';
+  if(!currentUser) return;
+  if(currentUser.role==='designer') renderDesignerDash();
+  else renderPrinterDash();
+}
 
-    window.editDesign = async (id,oldName,oldType,oldPrice) => {
-        let n=prompt("نام جدید",oldName), t=prompt("نوع جدید",oldType), p=parseInt(prompt("قیمت جدید",oldPrice));
-        if(n && t && p) await supabase.from('designs').update({name:n, type:t, price:p}).eq('id',id);
-        renderDashboard();
-    };
+/* ------- طراح ------- */
+function dTab(name){
+  document.querySelectorAll('#dash-designer .tab').forEach((t,i)=>{
+    const names=['overview','mydesigns','adddesign','dsales'];
+    t.classList.toggle('active',names[i]===name);
+  });
+  document.querySelectorAll('[id^="dt-"]').forEach(p=>p.classList.remove('active'));
+  document.getElementById('dt-'+name).classList.add('active');
+}
+function renderDesignerDash(){
+  document.getElementById('ds-username').textContent=currentUser.full_name;
+  const myD=getDesigns().filter(d=>d.designer_id===currentUser.id);
+  const ois=getOItems().filter(oi=>myD.some(d=>d.id===oi.design_id));
+  const rev=ois.reduce((s,i)=>s+Number(i.price_at_purchase),0);
+  const ordsSet=new Set(ois.map(i=>i.order_id));
+  const top=myD.sort((a,b)=>b.sales-a.sales)[0];
+  // KPI
+  document.getElementById('ds-kpi').innerHTML=`
+    <div class="kpi"><div class="ico">🎨</div><div class="v">${toP(myD.length)}</div><div class="l">طرح‌ها</div></div>
+    <div class="kpi"><div class="ico">💰</div><div class="v">${toP(rev.toLocaleString())}</div><div class="l">درآمد (تومان)</div></div>
+    <div class="kpi"><div class="ico">📦</div><div class="v">${toP(ordsSet.size)}</div><div class="l">سفارش‌ها</div></div>
+    <div class="kpi"><div class="ico">⭐</div><div class="v" style="font-size:1rem;">${top?top.name.slice(0,8)+'…':'—'}</div><div class="l">پرفروش‌ترین</div></div>`;
+  // نمودار
+  const months=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور'];
+  const total=myD.reduce((s,d)=>s+(d.sales||0),0);
+  const vals=months.map(()=>Math.max(1,Math.floor((total/6)*(0.4+Math.random()*0.8))));
+  const mx=Math.max(...vals);
+  document.getElementById('ds-chart').innerHTML=vals.map((v,i)=>`
+    <div class="bar-col"><div class="bar-fill" data-v="${toP(v)}" style="height:${Math.round(v/mx*100)}%;"></div><div class="bar-lbl">${months[i]}</div></div>`).join('');
+  // گرید طرح‌ها
+  renderDesignerGrid();
+  // لیست فروش
+  renderDesignerSales(ois, myD);
+}
+function renderDesignerGrid(){
+  const myD=getDesigns().filter(d=>d.designer_id===currentUser.id);
+  const grid=document.getElementById('ds-my-grid');
+  if(!myD.length){grid.innerHTML='<p style="color:var(--muted);padding:2rem;">هنوز طرحی اضافه نکرده‌اید ✨</p>';return;}
+  grid.innerHTML=myD.map(d=>`
+    <div class="design-card">
+      <div class="dc-img">${d.icon||'🎨'}<div class="dc-badge">${d.type}</div></div>
+      <div class="dc-body">
+        <div class="dc-name">${d.name}</div>
+        <div class="dc-meta"><div class="dc-price">${toP(Number(d.price).toLocaleString())} <span class="u">تومان</span></div><span class="badge badge-g">فروش: ${toP(d.sales||0)}</span></div>
+        <div class="dc-actions">
+          <button class="btn btn-primary btn-sm" onclick="openEdit('${d.id}')"><i class="fa fa-edit"></i> ویرایش</button>
+          <button class="btn btn-danger btn-sm" onclick="delDesign('${d.id}')"><i class="fa fa-trash"></i></button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function renderDesignerSales(ois, myD){
+  const el=document.getElementById('ds-sales-list');
+  if(!ois.length){el.innerHTML='<p style="color:var(--muted);padding:2rem;">هنوز فروشی ثبت نشده</p>';return;}
+  const orders=getOrders();
+  el.innerHTML=ois.map(oi=>{
+    const d=myD.find(x=>x.id===oi.design_id);
+    const o=orders.find(x=>x.id===oi.order_id);
+    return `<div class="order-item">
+      <div class="oi-info"><h4>${d?d.name:'طرح حذف‌شده'}</h4><p>${o?new Date(o.created_at).toLocaleDateString('fa-IR'):''}</p></div>
+      <div><div class="oi-price">${toP(Number(oi.price_at_purchase).toLocaleString())} تومان</div></div>
+    </div>`;
+  }).join('');
+}
 
-    window.deleteDesign = async (id) => { if(confirm("حذف شود؟")) { await supabase.from('designs').delete().eq('id',id); renderDashboard(); } };
-    window.showDesignerStats = (count, rev) => { document.getElementById("designerPanel").innerHTML = `<div>تعداد فروش: ${count}<br>درآمد: ${rev.toLocaleString()} تومان</div>`; };
+/* افزودن طرح از تب */
+function doAddDesign(){
+  const name=document.getElementById('fn-name').value.trim();
+  const type=document.getElementById('fn-type').value;
+  const price=parseInt(document.getElementById('fn-price').value);
+  const icon=document.getElementById('fn-icon').value.trim()||'🎨';
+  if(!name||!price){toast('❗','نام و قیمت الزامی است');return;}
+  const ds=getDesigns();
+  ds.push({id:'d_'+Date.now(),designer_id:currentUser.id,name,type,price,icon,sales:0,created_at:new Date().toISOString()});
+  saveDesigns(ds);
+  document.getElementById('fn-name').value='';
+  document.getElementById('fn-price').value='';
+  document.getElementById('fn-icon').value='';
+  renderDesignerDash();
+  dTab('mydesigns');
+  toast('✅',`«${name}» اضافه شد 🎉`);
+}
+/* افزودن از موال */
+function openAddDesignModal(){ openModal('modal-add'); }
+function doAddFromModal(){
+  const name=document.getElementById('ma-name').value.trim();
+  const type=document.getElementById('ma-type').value;
+  const price=parseInt(document.getElementById('ma-price').value);
+  const icon=document.getElementById('ma-icon').value.trim()||'🎨';
+  if(!name||!price){toast('❗','نام و قیمت الزامی است');return;}
+  const ds=getDesigns();
+  ds.push({id:'d_'+Date.now(),designer_id:currentUser.id,name,type,price,icon,sales:0,created_at:new Date().toISOString()});
+  saveDesigns(ds);
+  closeModal('modal-add');
+  renderDesignerDash();
+  toast('✅',`«${name}» اضافه شد 🎉`);
+}
+/* ویرایش */
+function openEdit(id){
+  const d=getDesigns().find(x=>x.id===id); if(!d) return;
+  document.getElementById('edit-id').value=d.id;
+  document.getElementById('edit-name').value=d.name;
+  document.getElementById('edit-type').value=d.type;
+  document.getElementById('edit-price').value=d.price;
+  document.getElementById('edit-icon').value=d.icon||'🎨';
+  openModal('modal-edit');
+}
+function doSaveEdit(){
+  const id=document.getElementById('edit-id').value;
+  const ds=getDesigns(); const i=ds.findIndex(d=>d.id===id); if(i<0) return;
+  ds[i].name=document.getElementById('edit-name').value||ds[i].name;
+  ds[i].type=document.getElementById('edit-type').value;
+  ds[i].price=parseInt(document.getElementById('edit-price').value)||ds[i].price;
+  ds[i].icon=document.getElementById('edit-icon').value||ds[i].icon;
+  saveDesigns(ds); closeModal('modal-edit'); renderDesignerDash(); toast('✅','طرح ویرایش شد');
+}
+/* حذف */
+function delDesign(id){
+  if(!confirm('حذف شود؟')) return;
+  saveDesigns(getDesigns().filter(d=>d.id!==id));
+  renderDesignerDash(); renderMarket(); toast('🗑️','طرح حذف شد');
+}
 
-    let printerCart = [];
-    async function printerDashboard() {
-        let { data: allDesigns } = await supabase.from('designs').select('*, users(full_name)');
-        let now = new Date(), monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-        let { data: monthOrders } = await supabase.from('orders').select('*, order_items(*)').eq('printer_id', currentUser.id).gte('order_month', monthStart);
-        let bought = monthOrders?.reduce((s,o)=> s + (o.order_items?.length||0),0) || 0;
-        let disc = bought>=10 ? 70 : bought>=8 ? 60 : bought>=4 ? 50 : 0;
-        let saved = localStorage.getItem(`cart_${currentUser.id}`);
-        printerCart = saved ? JSON.parse(saved) : [];
-        
-        main.innerHTML = `
-            <div class="dashboard">
-                <div class="tabs">
-                    <button class="tab active" onclick="showShop(${JSON.stringify(allDesigns).replace(/"/g,'&quot;')})">فروشگاه</button>
-                    <button class="tab" onclick="showPrinterCart()">سبد (${printerCart.length})</button>
-                    <button class="tab" onclick="showPrinterOrders()">سفارشات</button>
-                </div>
-                <div id="printerPanel"></div>
-                <div class="discount-badge">🎁 تخفیف ماه جاری: ${disc}% (${bought} طرح خریداری شده)</div>
-            </div>`;
-        showShop(allDesigns);
-    }
+/* ------- چاپخانه ------- */
+function pTab(name){
+  document.querySelectorAll('#dash-printer .tab').forEach((t,i)=>{
+    ['shop','cart','orders'].forEach((n,j)=>{ if(i===j) t.classList.toggle('active',n===name); });
+  });
+  document.querySelectorAll('[id^="pt-"]').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pt-'+name).classList.add('active');
+  if(name==='cart')   renderCartInline();
+  if(name==='orders') renderPrinterOrders();
+}
+function renderPrinterDash(){
+  document.getElementById('pr-username').textContent=currentUser.full_name;
+  renderPrinterShop();
+  updateDiscBanner();
+}
+function discPct(n){ return n>=10?70:n>=8?60:n>=4?50:0; }
+function updateDiscBanner(){
+  const cart=getCart(); const n=cart.length; const p=discPct(n);
+  document.getElementById('pr-disc-val').textContent=toP(p)+'٪';
+  document.getElementById('pr-cart-cnt').textContent=toP(n);
+  const mcc=document.getElementById('mkt-cart-cnt'); if(mcc) mcc.textContent=n;
+  ['4','8','10'].forEach(v=>{
+    const el=document.getElementById('dt'+v); if(!el) return;
+    el.className='dt'+(n>=(+v)?(' hit'):'');
+  });
+}
+function renderPrinterShop(){
+  const ds=getDesigns(); const cart=getCart();
+  document.getElementById('pr-shop-grid').innerHTML=ds.map(d=>{
+    const inCart=cart.some(c=>c.id===d.id);
+    return `<div class="design-card">
+      <div class="dc-img">${d.icon||'🎨'}<div class="dc-badge">${d.type}</div></div>
+      <div class="dc-body">
+        <div class="dc-name">${d.name}</div>
+        <div class="dc-meta"><div class="dc-price">${toP(Number(d.price).toLocaleString())} <span class="u">تومان</span></div><span style="font-size:.78rem;color:var(--muted);">فروش: ${toP(d.sales||0)}</span></div>
+        <div class="dc-actions">
+          ${inCart?`<button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;" disabled>✅ در سبد</button>`
+                  :`<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="addToCart('${d.id}')"><i class="fa fa-cart-plus"></i> افزودن</button>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-    window.showShop = (designs) => {
-        let html = `<div class="grid">`;
-        designs.forEach(d => { html += `<div class="card"><h3>${d.name}</h3><p>${d.type} - طراح: ${d.users?.full_name || 'نامشخص'}</p><div class="price">${d.price.toLocaleString()} تومان</div><button onclick="addToCart('${d.id}')">➕ افزودن به سبد</button></div>`; });
-        html += `</div>`;
-        document.getElementById("printerPanel").innerHTML = html;
-    };
+/* ===================== سبد ===================== */
+function addToCart(id){
+  const cart=getCart();
+  if(cart.some(c=>c.id===id)){toast('ℹ️','قبلاً اضافه شده');return;}
+  const d=getDesigns().find(x=>x.id===id); if(!d) return;
+  cart.push({id:d.id,name:d.name,price:d.price,icon:d.icon,type:d.type});
+  saveCart(cart);
+  updateDiscBanner();
+  renderMarket();
+  if(currentUser&&currentUser.role==='printer') renderPrinterShop();
+  toast('🛒',`«${d.name}» به سبد اضافه شد`);
+}
+function rmFromCart(id){
+  saveCart(getCart().filter(c=>c.id!==id));
+  renderCartPanel(); renderCartInline();
+  updateDiscBanner(); renderMarket();
+  if(currentUser&&currentUser.role==='printer') renderPrinterShop();
+}
 
-    window.addToCart = (id) => { if(!printerCart.includes(id)){ printerCart.push(id); localStorage.setItem(`cart_${currentUser.id}`,JSON.stringify(printerCart)); renderDashboard(); } };
-    
-    window.showPrinterCart = async () => {
-        if(printerCart.length===0){ document.getElementById("printerPanel").innerHTML="<div class='message'>سبد خالی</div>"; return; }
-        let designs=[];
-        for(let id of printerCart){ let {data:d}=await supabase.from('designs').select('*').eq('id',id).single(); if(d) designs.push(d); }
-        let total=designs.reduce((s,d)=>s+d.price,0);
-        let now=new Date(), monthStart=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
-        let {data:monthOrders}=await supabase.from('orders').select('*, order_items(*)').eq('printer_id',currentUser.id).gte('order_month',monthStart);
-        let bought=monthOrders?.reduce((s,o)=>s+(o.order_items?.length||0),0)||0;
-        let disc=bought>=10?70:bought>=8?60:bought>=4?50:0;
-        let final=total*(1-disc/100);
-        let html=`<div>`;
-        designs.forEach(d=>{ html+=`<div style="display:flex; justify-content:space-between;">${d.name} - ${d.price.toLocaleString()} تومان <button class="danger" onclick="removeFromCart('${d.id}')">حذف</button></div>`; });
-        html+=`<hr>قیمت اصلی: ${total.toLocaleString()} تومان<br>تخفیف ${disc}%: ${(total-final).toLocaleString()} تومان<br><strong>قابل پرداخت: ${Math.floor(final).toLocaleString()} تومان</strong><br><button class="success" onclick="finalizeOrder()">ثبت سفارش ماهانه</button></div>`;
-        document.getElementById("printerPanel").innerHTML = html;
-    };
+/* سبد پاپ‌آپ */
+function openCart(){ renderCartPanel(); document.getElementById('cart-overlay').classList.add('open'); }
+function closeCart(){ document.getElementById('cart-overlay').classList.remove('open'); }
+function cartBgClick(e){ if(e.target===document.getElementById('cart-overlay')) closeCart(); }
+function renderCartPanel(){
+  const cart=getCart();
+  const ci=document.getElementById('cart-items');
+  const cs=document.getElementById('cart-sum');
+  const ce=document.getElementById('cart-empty-msg');
+  const ck=document.getElementById('btn-checkout');
+  if(!cart.length){ci.innerHTML='';cs.innerHTML='';ce.style.display='block';ck.style.display='none';return;}
+  ce.style.display='none'; ck.style.display='flex';
+  ci.innerHTML=cart.map(c=>`
+    <div class="cart-item">
+      <div class="ci-icon">${c.icon||'🎨'}</div>
+      <div class="ci-info"><div class="ci-name">${c.name}</div><div class="ci-price">${toP(Number(c.price).toLocaleString())} تومان</div></div>
+      <button class="ci-rm" onclick="rmFromCart('${c.id}')"><i class="fa fa-trash"></i></button>
+    </div>`).join('');
+  const sub=cart.reduce((s,c)=>s+Number(c.price),0);
+  const p=discPct(cart.length), disc=Math.round(sub*p/100), total=sub-disc;
+  cs.innerHTML=`<div class="cart-summary">
+    <div class="s-row"><span>جمع اقلام</span><span>${toP(sub.toLocaleString())} تومان</span></div>
+    ${p>0?`<div class="s-row disc"><span>تخفیف <span class="disc-pill">${toP(p)}٪</span></span><span>−${toP(disc.toLocaleString())} تومان</span></div>`:''}
+    <div class="s-row total"><span>مبلغ نهایی</span><span>${toP(total.toLocaleString())} تومان</span></div>
+  </div>`;
+}
+/* سبد داخل تب */
+function renderCartInline(){
+  const el=document.getElementById('pr-cart-inline');
+  const cart=getCart();
+  if(!cart.length){el.innerHTML='<div class="cart-empty"><div class="e-ico">🛒</div><p style="color:var(--muted);">سبد خالی است</p></div>';return;}
+  const sub=cart.reduce((s,c)=>s+Number(c.price),0);
+  const p=discPct(cart.length),disc=Math.round(sub*p/100),total=sub-disc;
+  el.innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem;">
+      ${cart.map(c=>`<div class="cart-item"><div class="ci-icon">${c.icon||'🎨'}</div><div class="ci-info"><div class="ci-name">${c.name}</div><div class="ci-price">${toP(Number(c.price).toLocaleString())} تومان</div></div><button class="ci-rm" onclick="rmFromCart('${c.id}')"><i class="fa fa-trash"></i></button></div>`).join('')}
+    </div>
+    <div class="cart-summary">
+      <div class="s-row"><span>جمع</span><span>${toP(sub.toLocaleString())} تومان</span></div>
+      ${p>0?`<div class="s-row disc"><span>تخفیف ${toP(p)}٪</span><span>−${toP(disc.toLocaleString())} تومان</span></div>`:''}
+      <div class="s-row total"><span>مبلغ نهایی</span><span>${toP(total.toLocaleString())} تومان</span></div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doCheckout()"><i class="fa fa-check-circle"></i> ثبت سفارش ✨</button>`;
+}
 
-    window.removeFromCart = (id) => { printerCart = printerCart.filter(i=>i!==id); localStorage.setItem(`cart_${currentUser.id}`,JSON.stringify(printerCart)); renderDashboard(); };
-    
-    window.finalizeOrder = async () => {
-        if(printerCart.length===0) return;
-        let designs=[]; for(let id of printerCart){ let {data:d}=await supabase.from('designs').select('*').eq('id',id).single(); if(d) designs.push(d); }
-        let total=designs.reduce((s,d)=>s+d.price,0);
-        let now=new Date(), monthStart=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
-        let {data:monthOrders}=await supabase.from('orders').select('*, order_items(*)').eq('printer_id',currentUser.id).gte('order_month',monthStart);
-        let bought=monthOrders?.reduce((s,o)=>s+(o.order_items?.length||0),0)||0;
-        let disc=bought>=10?70:bought>=8?60:bought>=4?50:0;
-        let final=total*(1-disc/100);
-        let {data:order,error}=await supabase.from('orders').insert([{printer_id:currentUser.id, order_month:monthStart, total_amount:Math.floor(final), discount_percent:disc}]).select().single();
-        if(error){ alert("خطا در ثبت سفارش: "+error.message); return; }
-        for(let d of designs){ await supabase.from('order_items').insert([{order_id:order.id, design_id:d.id, price_at_purchase:d.price}]); }
-        printerCart=[]; localStorage.removeItem(`cart_${currentUser.id}`); alert(`سفارش ثبت شد. مبلغ: ${Math.floor(final).toLocaleString()} تومان`); renderDashboard();
-    };
+/* ثبت سفارش */
+function doCheckout(){
+  const cart=getCart(); if(!cart.length) return;
+  const sub=cart.reduce((s,c)=>s+Number(c.price),0);
+  const p=discPct(cart.length),disc=Math.round(sub*p/100),total=sub-disc;
+  const oid='ord_'+Date.now();
+  const orders=getOrders();
+  orders.push({id:oid,printer_id:currentUser.id,order_month:monthKey(),total_amount:total,discount_percent:p,created_at:new Date().toISOString()});
+  saveOrders(orders);
+  const ois=getOItems();
+  const ds=getDesigns();
+  cart.forEach(c=>{
+    ois.push({id:'oi_'+Date.now()+Math.random().toString(36).substr(2,4),order_id:oid,design_id:c.id,price_at_purchase:c.price});
+    const di=ds.findIndex(d=>d.id===c.id); if(di>=0){ds[di].sales=(ds[di].sales||0)+1;}
+  });
+  saveOItems(ois); saveDesigns(ds);
+  localStorage.removeItem(monthKey());
+  closeCart(); updateDiscBanner(); renderMarket();
+  renderPrinterShop();
+  pTab('orders');
+  toast('🎉',`سفارش ثبت شد! مبلغ: ${toP(total.toLocaleString())} تومان${p>0?` (${toP(p)}٪ تخفیف)`:''}`);
+}
 
-    window.showPrinterOrders = async () => {
-        let {data:orders}=await supabase.from('orders').select('*, order_items(*)').eq('printer_id',currentUser.id);
-        if(!orders?.length){ document.getElementById("printerPanel").innerHTML="<div class='message'>سفارشی نیست</div>"; return; }
-        let html="";
-        for(let o of orders){ html+=`<div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:16px;">تاریخ: ${new Date(o.created_at).toLocaleDateString('fa-IR')} - تخفیف: ${o.discount_percent}% - مبلغ: ${o.total_amount.toLocaleString()} تومان - تعداد: ${o.order_items?.length||0} طرح</div>`; }
-        document.getElementById("printerPanel").innerHTML = html;
-    };
+function renderPrinterOrders(){
+  const orders=getOrders().filter(o=>o.printer_id===currentUser.id);
+  const el=document.getElementById('pr-orders-list');
+  if(!orders.length){el.innerHTML='<p style="color:var(--muted);padding:2rem;">هنوز سفارشی ثبت نشده</p>';return;}
+  const ois=getOItems();
+  el.innerHTML=orders.slice().reverse().map(o=>{
+    const items=ois.filter(i=>i.order_id===o.id);
+    return `<div class="order-item">
+      <div class="oi-info"><h4>سفارش #${o.id.slice(-6)}</h4><p>${new Date(o.created_at).toLocaleDateString('fa-IR')} — ${toP(items.length)} طرح</p></div>
+      <div>
+        ${o.discount_percent>0?`<span class="badge badge-g" style="margin-left:.5rem;">${toP(o.discount_percent)}٪ تخفیف</span>`:''}
+        <div class="oi-price">${toP(o.total_amount.toLocaleString())} تومان</div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-    renderDashboard();
+/* ===================== موال‌ها ===================== */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+/* ===================== توست ===================== */
+let tTimer;
+function toast(ico,msg){
+  document.getElementById('t-ico').textContent=ico;
+  document.getElementById('t-msg').textContent=msg;
+  const el=document.getElementById('toast');
+  el.classList.add('show'); clearTimeout(tTimer);
+  tTimer=setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+/* ===================== اعداد فارسی ===================== */
+function toP(n){ return String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]); }
+
+/* ===================== راه‌اندازی ===================== */
+initData();
+renderNav();
+updateHomeStats();
+renderMarket();
 </script>
 </body>
 </html>
+HTMLEOF
+echo "done"
+Output
+
+done
+Done
+
+
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+
+
+
+
