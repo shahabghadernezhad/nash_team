@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nash Graphic Team | پلتفرم طراحی و چاپ</title>
+
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: #0a0a0a;
+      color: #f5f5f5;
+      direction: rtl;
+      overflow-x: hidden;
+    }
+    
+    /* ========== رنگ‌ها و متغیرها ========== */
+    :root {
+      --gold: #D4AF37;
+      --gold-dark: #A88920;
+      --orange: #E07020;
+      --dark: #0F0F0F;
+      --surface: #1A1A1A;
+      --surface-light: #252525;
+      --text-muted: #9a9a9a;
+    }
+
+    /* ========== اسکرول ========== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--dark); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+    /* ========== هدر ========== */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(15,15,15,.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(212,175,55,.3);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    .logo img {
+      height: 48px;
+      width: auto;
+      border-radius: 12px;
+    }
+    .logo-text {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: white;
+    }
+    .logo-text span { color: var(--gold); }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: #ddd;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      color: var(--gold);
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn-outline:hover {
+      background: rgba(212,175,55,.15);
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold), var(--orange));
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 40px;
+      color: #0a0a0a;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    /* ========== صفحات ========== */
+    .page {
+      display: none;
+      min-height: 100vh;
+      padding-top: 90px;
+    }
+    .page.active { display: block; }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ========== صفحه اصلی (Home) ========== */
+    .hero-section {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, rgba(212,175,55,.08), transparent);
+      border-radius: 40px;
+      margin-bottom: 3rem;
+    }
+    .hero-section h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .hero-section h1 span { color: var(--gold); }
+    .hero-section p { color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+    .feature-card {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 2rem;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,.05);
+      transition: 0.3s;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(212,175,55,.3);
+    }
+    .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .feature-card h3 { margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 0.85rem; color: var(--text-muted); }
+
+    .team-section {
+      background: var(--surface);
+      border-radius: 30px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .team-grid {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    .team-member {
+      text-align: center;
+    }
+    .team-avatar {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, var(--gold), var(--orange));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 1rem;
+    }
+
+    /* ========== لاگین کارت ========== */
+    .login-card {
+      max-width: 480px;
+      margin: 2rem auto;
+      background: var(--surface);
+      border-radius: 32px;
+      padding: 2rem;
+      border: 1px solid rgba(212,175,55,.2);
+    }
+    .role-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      background: var(--surface-light);
+      padding: 0.3rem;
+      border-radius: 60px;
+    }
+    .role-tab {
+      flex: 1;
+      padding: 0.6rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-radius: 40px;
+      cursor: pointer;
+    }
+    .role-tab.active {
+      background: linear-gradient(135deg, var(--gold), var(--orange));
+      color: #0a0a0a;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: var(--surface-light);
+      border: 1px solid #333;
+      border-radius: 16px;
+      color: white;
+      font-family: inherit;
+    }
+    .form-group input:focus {
+      border-color: var(--gold);
+      outline: none;
+    }
+
+    /* ========== داشبورد ========== */
+    .designs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .design-card {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 1.2rem;
+      border: 1px solid rgba(255,255,255,.05);
+      transition: 0.3s;
+    }
+    .design-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(212,175,55,.3);
+    }
+    .card-image {
+      font-size: 2.5rem;
+      text-align: center;
+      padding: 1rem;
+      background: var(--surface-light);
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+    .card-price {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--gold);
+    }
+    .discount-banner {
+      background: linear-gradient(135deg, rgba(212,175,55,.1), rgba(224,112,32,.05));
+      border-radius: 24px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .tier-badge {
+      padding: 0.3rem 1rem;
+      background: rgba(212,175,55,.1);
+      border-radius: 40px;
+      font-size: 0.8rem;
+    }
+    .tier-badge.active {
+      background: var(--gold);
+      color: #0a0a0a;
+    }
+
+    /* ========== سبد خرید ========== */
+    .cart-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      justify-content: flex-end;
+    }
+    .cart-overlay.open { display: flex; }
+    .cart-panel {
+      width: 400px;
+      background: var(--surface);
+      height: 100vh;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem;
+      border-bottom: 1px solid #333;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid rgba(212,175,55,.1);
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 1rem; }
+      .nav-links { gap: 0.8rem; }
+      .hero-section h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header id="main-header" style="display: none;">
+  <a href="#" class="logo" onclick="showHome(); return false;">
+    <!-- 🔽 لینک لوگوی خودت رو اینجا جایگزین کن 🔽 -->
+    <img src="https://github.com/shahbaghedmezhad/nash_team/raw/main/photo_2026-05-28_23-59-32%20(2).jpg" 
+         alt="Nash Logo" 
+         onerror="this.src='https://placehold.co/48x48?text=N'">
+    <div class="logo-text">Nash <span>Team</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="#" onclick="showHome(); return false;">🏠 خانه</a>
+    <a href="#" onclick="showAbout(); return false;">📖 درباره ما</a>
+    <div id="header-user-area"></div>
+  </div>
+</header>
+
+<!-- ========== صفحه اصلی (Home) ========== -->
+<div id="page-home" class="page active">
+  <div class="container">
+    <div class="hero-section">
+      <h1>Nash <span>Graphic Team</span></h1>
+      <p>پلتفرم حرفه‌ای ارتباط طراحان و چاپخانه‌ها</p>
+      <button class="btn-gold" style="margin-top: 1.5rem;" onclick="showLoginPage()">
+        <i class="fa fa-sign-in-alt"></i> شروع کنید
+      </button>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>طراحان حرفه‌ای</h3>
+        <p>آثار خود را به فروش برسانید و درآمد کسب کنید</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖨️</div>
+        <h3>چاپخانه‌ها</h3>
+        <p>بهترین طرح‌ها را با تخفیف ماهانه تهیه کنید</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✨</div>
+        <h3>تخفیف تا ۷۰٪</h3>
+        <p>هرچه بیشتر بخرید، تخفیف بیشتری دریافت کنید</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>سفارش سریع</h3>
+        <p>ثبت سفارش در چند ثانیه</p>
+      </div>
+    </div>
+
+    <div class="team-section">
+      <h2>درباره <span style="color:var(--gold)">تیم ما</span></h2>
+      <p style="max-width: 600px; margin: 1rem auto;">ما با بیش از ۵ سال تجربه در حوزه طراحی و چاپ، بستری امن و سریع برای ارتباط حرفه‌ای ایجاد کرده‌ایم.</p>
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="team-avatar">👨‍🎨</div>
+          <h4>مدیریت خلاقیت</h4>
+          <p style="font-size:0.8rem;">تیم طراحی حرفه‌ای</p>
+        </div>
+        <div class="team-member">
+          <div class="team-avatar">🖨️</div>
+          <h4>مدیریت چاپ</h4>
+          <p style="font-size:0.8rem;">همکاری با بهترین چاپخانه‌ها</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <span style="color:var(--gold)">Nash Graphic Team</span> — پلتفرم حرفه‌ای طراحی و چاپ
+  </footer>
+</div>
+
+<!-- ========== صفحه درباره ما (جدا) ========== -->
+<div id="page-about" class="page">
+  <div class="container">
+    <div class="hero-section">
+      <h1>درباره <span>ما</span></h1>
+      <p>Nash Graphic Team</p>
+    </div>
+    <div style="background:var(--surface); border-radius:30px; padding:2rem; margin:2rem 0;">
+      <h3 style="color:var(--gold); margin-bottom:1rem;">چرا نش؟</h3>
+      <p>ما پلتفرمی ایجاد کرده‌ایم تا طراحان بتوانند آثار خود را مستقیماً به چاپخانه‌ها بفروشند و چاپخانه‌ها نیز با کمترین هزینه و بیشترین تنوع، طرح‌های مورد نیاز خود را تهیه کنند.</p>
+      <p style="margin-top:1rem;">✨ تخفیف‌های ماهانه تا ۷۰٪<br>✨ بیش از ۵۰۰ طرح حرفه‌ای<br>✨ ارتباط مستقیم با طراحان برتر</p>
+    </div>
+  </div>
+  <footer>
+    <span style="color:var(--gold)">Nash Graphic Team</span> — پلتفرم حرفه‌ای طراحی و چاپ
+  </footer>
+</div>
+
+<!-- ========== صفحه لاگین ========== -->
+<div id="page-login" class="page">
+  <div class="container">
+    <div class="login-card">
+      <div style="text-align:center; margin-bottom:1.5rem;">
+        <h2>✨ Nash Team</h2>
+        <p>ورود / ثبت‌نام</p>
+      </div>
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="setLoginRole('printer')">🖨 چاپخانه</button>
+        <button class="role-tab" onclick="setLoginRole('designer')">🎨 طراح</button>
+      </div>
+      <div class="form-group">
+        <input type="email" id="login-email" placeholder="ایمیل">
+      </div>
+      <div class="form-group">
+        <input type="text" id="login-name" placeholder="نام کامل">
+      </div>
+      <div class="form-group">
+        <input type="password" id="login-pass" placeholder="رمز عبور (نمایشی)">
+      </div>
+      <button class="btn-gold" style="width:100%;" onclick="doLogin()">
+        <i class="fa fa-sign-in-alt"></i> ورود / ثبت‌نام
+      </button>
+      <p style="font-size:0.8rem; text-align:center; margin-top:1rem;">برای تست: هر ایمیل و نامی قابل قبول است</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== داشبورد چاپخانه ========== -->
+<div id="page-printer" class="page">
+  <div class="container">
+    <div class="discount-banner" id="printer-discount-banner">
+      <span>🎁 تخفیف ماه جاری: <strong id="discount-pct">0%</strong></span>
+      <div style="display:flex; gap:0.5rem;">
+        <span class="tier-badge" id="tier4">۴ طرح ۵۰%</span>
+        <span class="tier-badge" id="tier8">۸ طرح ۶۰%</span>
+        <span class="tier-badge" id="tier10">۱۰ طرح ۷۰%</span>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+      <h2>🎨 طرح‌های موجود</h2>
+      <button class="btn-outline" onclick="openCart()"><i class="fa fa-shopping-cart"></i> سبد خرید (<span id="cart-count">0</span>)</button>
+    </div>
+    <div class="designs-grid" id="printer-grid"></div>
+  </div>
+  <footer><span>Nash Graphic Team</span> — پلتفرم حرفه‌ای طراحی و چاپ</footer>
+</div>
+
+<!-- ========== داشبورد طراح ========== -->
+<div id="page-designer" class="page">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+      <h2>🎨 مدیریت طرح‌ها</h2>
+      <button class="btn-gold" onclick="openAddDesignModal()"><i class="fa fa-plus"></i> افزودن طرح</button>
+    </div>
+    <div class="designs-grid" id="designer-grid"></div>
+    <div style="margin-top:2rem; background:var(--surface); border-radius:24px; padding:1.5rem;">
+      <h3>📊 آمار فروش</h3>
+      <div id="designer-stats" style="display:flex; gap:2rem; flex-wrap:wrap; margin-top:1rem;"></div>
+    </div>
+  </div>
+  <footer><span>Nash Graphic Team</span> — پلتفرم حرفه‌ای طراحی و چاپ</footer>
+</div>
+
+<!-- ========== سبد خرید ========== -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart(event)">
+  <div class="cart-panel">
+    <h3 style="margin-bottom:1rem;">🛒 سبد خرید ماهانه</h3>
+    <div id="cart-items"></div>
+    <div id="cart-summary" style="margin-top:1rem;"></div>
+    <button class="btn-gold" style="width:100%; margin-top:1rem;" onclick="checkout()">✅ ثبت سفارش</button>
+    <button class="btn-outline" style="width:100%; margin-top:0.5rem;" onclick="closeCartPanel()">بستن</button>
+  </div>
+</div>
+
+<!-- ========== موال افزودن طرح ========== -->
+<div class="cart-overlay" id="modal-add" style="justify-content:center;" onclick="if(event.target===this) closeAddModal()">
+  <div style="background:var(--surface); border-radius:32px; padding:2rem; width:90%; max-width:500px;">
+    <h3>➕ طرح جدید</h3>
+    <div class="form-group"><input type="text" id="new-name" placeholder="نام طرح"></div>
+    <div class="form-group">
+      <select id="new-type">
+        <option value="بنر">بنر</option><option value="کارت ویزیت">کارت ویزیت</option>
+        <option value="بروشور">بروشور</option><option value="پوستر">پوستر</option>
+        <option value="لوگو">لوگو</option><option value="استیکر">استیکر</option>
+      </select>
+    </div>
+    <div class="form-group"><input type="number" id="new-price" placeholder="قیمت (تومان)"></div>
+    <div class="form-group"><input type="text" id="new-icon" placeholder="آیکون (🎨)" maxlength="4"></div>
+    <button class="btn-gold" style="width:100%;" onclick="addDesignSubmit()">ذخیره</button>
+    <button class="btn-outline" style="width:100%; margin-top:0.5rem;" onclick="closeAddModal()">انصراف</button>
+  </div>
+</div>
+
+<script>
+  // ========== ذخیره‌سازی اولیه ==========
+  function initData() {
+    if (!localStorage.getItem('nash_users')) {
+      localStorage.setItem('nash_users', JSON.stringify([
+        { id: 'u1', email: 'designer@test.com', full_name: 'علی رضایی', role: 'designer' },
+        { id: 'u2', email: 'printer@test.com', full_name: 'سارا احمدی', role: 'printer' }
+      ]));
+    }
+    if (!localStorage.getItem('nash_designs')) {
+      localStorage.setItem('nash_designs', JSON.stringify([
+        { id: 'd1', designer_id: 'u1', name: 'بنر عید نوروز', type: 'بنر', price: 120000, icon: '🎋', sales: 14 },
+        { id: 'd2', designer_id: 'u1', name: 'کارت ویزیت مدرن', type: 'کارت ویزیت', price: 85000, icon: '💼', sales: 22 },
+        { id: 'd3', designer_id: 'u1', name: 'پوستر تبلیغاتی', type: 'پوستر', price: 150000, icon: '🖼️', sales: 8 },
+        { id: 'd4', designer_id: 'u1', name: 'لوگو اختصاصی', type: 'لوگو', price: 200000, icon: '✨', sales: 17 }
+      ]));
+    }
+    if (!localStorage.getItem('nash_orders')) localStorage.setItem('nash_orders', '[]');
+    if (!localStorage.getItem('nash_order_items')) localStorage.setItem('nash_order_items', '[]');
+  }
+  initData();
+
+  let currentUser = null;
+  let loginRole = 'printer';
+
+  // ========== توابع کمکی ==========
+  function getUsers() { return JSON.parse(localStorage.getItem('nash_users')); }
+  function getDesigns() { return JSON.parse(localStorage.getItem('nash_designs')); }
+  function saveDesigns(d) { localStorage.setItem('nash_designs', JSON.stringify(d)); }
+  function getOrders() { return JSON.parse(localStorage.getItem('nash_orders')); }
+  function saveOrders(o) { localStorage.setItem('nash_orders', JSON.stringify(o)); }
+  function getOrderItems() { return JSON.parse(localStorage.getItem('nash_order_items')); }
+  function saveOrderItems(i) { localStorage.setItem('nash_order_items', JSON.stringify(i)); }
+
+  function getMonthKey() { const d = new Date(); return `${d.getFullYear()}_${d.getMonth()+1}`; }
+  function getCart() { return JSON.parse(localStorage.getItem(`nash_cart_${getMonthKey()}`) || '[]'); }
+  function saveCart(c) { localStorage.setItem(`nash_cart_${getMonthKey()}`, JSON.stringify(c)); }
+
+  function getDiscountPct(count) {
+    if (count >= 10) return 70;
+    if (count >= 8) return 60;
+    if (count >= 4) return 50;
+    return 0;
+  }
+
+  // ========== نمایش صفحات ==========
+  function showHome() { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-home').classList.add('active'); }
+  function showAbout() { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-about').classList.add('active'); }
+  function showLoginPage() { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('page-login').classList.add('active'); }
+  
+  function setLoginRole(r) { loginRole = r; document.querySelectorAll('.role-tab').forEach((t,i) => { t.classList.toggle('active', (r==='printer'&&i===0)||(r==='designer'&&i===1)); }); }
+
+  function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const name = document.getElementById('login-name').value.trim() || 'کاربر';
+    if (!email) { alert('ایمیل را وارد کنید'); return; }
+    let users = getUsers();
+    let user = users.find(u => u.email === email && u.role === loginRole);
+    if (!user) {
+      user = { id: 'u_' + Date.now(), email, full_name: name, role: loginRole };
+      users.push(user);
+      localStorage.setItem('nash_users', JSON.stringify(users));
+    }
+    currentUser = user;
+    document.getElementById('main-header').style.display = 'flex';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    if (user.role === 'printer') {
+      document.getElementById('page-printer').classList.add('active');
+      renderPrinterDashboard();
+    } else {
+      document.getElementById('page-designer').classList.add('active');
+      renderDesignerDashboard();
+    }
+    updateHeaderUI();
+  }
+
+  function updateHeaderUI() {
+    const area = document.getElementById('header-user-area');
+    if (currentUser) {
+      area.innerHTML = `<span style="color:var(--gold); margin-left:1rem;">${currentUser.full_name}</span>
+                        <button class="btn-outline" onclick="logout()">خروج</button>`;
+    } else {
+      area.innerHTML = `<button class="btn-outline" onclick="showLoginPage()">ورود</button>`;
+    }
+  }
+
+  function logout() {
+    currentUser = null;
+    document.getElementById('main-header').style.display = 'none';
+    showHome();
+    updateHeaderUI();
+  }
+
+  // ========== داشبورد چاپخانه ==========
+  function renderPrinterDashboard() {
+    const designs = getDesigns();
+    const cart = getCart();
+    const count = cart.length;
+    const disc = getDiscountPct(count);
+    document.getElementById('discount-pct').innerHTML = disc + '%';
+    document.getElementById('tier4').classList.toggle('active', count>=4 && count<8);
+    document.getElementById('tier8').classList.toggle('active', count>=8 && count<10);
+    document.getElementById('tier10').classList.toggle('active', count>=10);
+    document.getElementById('cart-count').innerHTML = count;
+    
+    const grid = document.getElementById('printer-grid');
+    grid.innerHTML = designs.map(d => {
+      const inCart = cart.some(c => c.id === d.id);
+      return `<div class="design-card">
+        <div class="card-image">${d.icon || '🎨'}</div>
+        <h3>${d.name}</h3>
+        <p style="color:#999; font-size:0.8rem;">${d.type}</p>
+        <div class="card-price">${d.price.toLocaleString()} تومان</div>
+        ${inCart ? '<button class="btn-outline" style="width:100%;" disabled>✅ در سبد</button>' : 
+                   `<button class="btn-gold" style="width:100%;" onclick="addToCart('${d.id}')">➕ افزودن به سبد</button>`}
+      </div>`;
+    }).join('');
+  }
+
+  function addToCart(id) {
+    const design = getDesigns().find(d => d.id === id);
+    if (!design) return;
+    const cart = getCart();
+    if (cart.some(c => c.id === id)) return;
+    cart.push({ id: design.id, name: design.name, price: design.price, icon: design.icon });
+    saveCart(cart);
+    renderPrinterDashboard();
+    updateCartUI();
+  }
+
+  function openCart() { updateCartUI(); document.getElementById('cart-overlay').classList.add('open'); }
+  function closeCart(e) { if (e.target === document.getElementById('cart-overlay')) closeCartPanel(); }
+  function closeCartPanel() { document.getElementById('cart-overlay').classList.remove('open'); }
+
+  function updateCartUI() {
+    const cart = getCart();
+    const subtotal = cart.reduce((s,i) => s + i.price, 0);
+    const disc = getDiscountPct(cart.length);
+    const discountAmt = Math.round(subtotal * disc / 100);
+    const total = subtotal - discountAmt;
+    document.getElementById('cart-items').innerHTML = cart.map(i => `
+      <div class="cart-item">
+        <span>${i.icon || '🎨'} ${i.name}</span>
+        <span>${i.price.toLocaleString()} تومان</span>
+        <button style="background:none; border:none; color:#ff4444;" onclick="removeFromCart('${i.id}')"><i class="fa fa-trash"></i></button>
+      </div>
+    `).join('');
+    document.getElementById('cart-summary').innerHTML = `
+      <div>جمع: ${subtotal.toLocaleString()} تومان</div>
+      ${disc > 0 ? `<div style="color:#4caf50;">تخفیف ${disc}%: -${discountAmt.toLocaleString()} تومان</div>` : ''}
+      <div style="font-size:1.2rem; font-weight:bold; margin-top:0.5rem;">قابل پرداخت: ${total.toLocaleString()} تومان</div>
+    `;
+    document.getElementById('cart-count').innerHTML = cart.length;
+  }
+
+  function removeFromCart(id) {
+    const cart = getCart().filter(c => c.id !== id);
+    saveCart(cart);
+    renderPrinterDashboard();
+    updateCartUI();
+  }
+
+  function checkout() {
+    const cart = getCart();
+    if (cart.length === 0) return;
+    const subtotal = cart.reduce((s,i) => s + i.price, 0);
+    const disc = getDiscountPct(cart.length);
+    const total = subtotal - Math.round(subtotal * disc / 100);
+    const orderId = 'ord_' + Date.now();
+    const orders = getOrders();
+    orders.push({ id: orderId, printer_id: currentUser.id, order_month: getMonthKey(), total_amount: total, discount_percent: disc });
+    saveOrders(orders);
+    const items = getOrderItems();
+    cart.forEach(c => {
+      items.push({ id: 'oi_' + Date.now() + Math.random(), order_id: orderId, design_id: c.id, price_at_purchase: c.price });
+      const designs = getDesigns();
+      const dIdx = designs.findIndex(d => d.id === c.id);
+      if (dIdx !== -1) designs[dIdx].sales = (designs[dIdx].sales || 0) + 1;
+      saveDesigns(designs);
+    });
+    saveOrderItems(items);
+    saveCart([]);
+    renderPrinterDashboard();
+    closeCartPanel();
+    alert(`✅ سفارش شما ثبت شد!\nمبلغ قابل پرداخت: ${total.toLocaleString()} تومان`);
+  }
+
+  // ========== داشبورد طراح ==========
+  function renderDesignerDashboard() {
+    const myDesigns = getDesigns().filter(d => d.designer_id === currentUser.id);
+    const grid = document.getElementById('designer-grid');
+    if (myDesigns.length === 0) {
+      grid.innerHTML = '<p style="text-align:center; padding:2rem;">هنوز طرحی اضافه نکرده‌اید.</p>';
+    } else {
+      grid.innerHTML = myDesigns.map(d => `
+        <div class="design-card">
+          <div class="card-image">${d.icon || '🎨'}</div>
+          <h3>${d.name}</h3>
+          <p style="color:#999;">${d.type}</p>
+          <div class="card-price">${d.price.toLocaleString()} تومان</div>
+          <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+            <button class="btn-outline" style="flex:1;" onclick="editDesign('${d.id}')">ویرایش</button>
+            <button class="btn-outline" style="flex:1;" onclick="deleteDesign('${d.id}')">حذف</button>
+          </div>
+        </div>
+      `).join('');
+    }
+    const sales = myDesigns.reduce((s,d) => s + (d.sales || 0), 0);
+    const revenue = myDesigns.reduce((s,d) => s + (d.price * (d.sales || 0)), 0);
+    document.getElementById('designer-stats').innerHTML = `
+      <div><strong>📦 کل فروش:</strong> ${sales} طرح</div>
+      <div><strong>💰 درآمد:</strong> ${revenue.toLocaleString()} تومان</div>
+      <div><strong>🎨 تعداد طرح:</strong> ${myDesigns.length}</div>
+    `;
+  }
+
+  function openAddDesignModal() { document.getElementById('modal-add').style.display = 'flex'; }
+  function closeAddModal() { document.getElementById('modal-add').style.display = 'none'; }
+  function addDesignSubmit() {
+    const name = document.getElementById('new-name').value.trim();
+    const type = document.getElementById('new-type').value;
+    const price = parseInt(document.getElementById('new-price').value);
+    const icon = document.getElementById('new-icon').value.trim() || '🎨';
+    if (!name || !price) { alert('نام و قیمت الزامی است'); return; }
+    const designs = getDesigns();
+    designs.push({ id: 'd_' + Date.now(), designer_id: currentUser.id, name, type, price, icon, sales: 0 });
+    saveDesigns(designs);
+    closeAddModal();
+    renderDesignerDashboard();
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-price').value = '';
+    document.getElementById('new-icon').value = '';
+  }
+
+  function editDesign(id) {
+    const designs = getDesigns();
+    const d = designs.find(d => d.id === id);
+    if (!d) return;
+    const newName = prompt('نام جدید:', d.name);
+    const newPrice = parseInt(prompt('قیمت جدید:', d.price));
+    if (newName && newPrice) {
+      d.name = newName;
+      d.price = newPrice;
+      saveDesigns(designs);
+      renderDesignerDashboard();
+    }
+  }
+
+  function deleteDesign(id) {
+    if (!confirm('حذف شود؟')) return;
+    saveDesigns(getDesigns().filter(d => d.id !== id));
+    renderDesignerDashboard();
+  }
+
+  updateHeaderUI();
+  showHome();
+</script>
+</body>
+</html>
