@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازارچه طراحی چاپ - نسخه کامل با دیتابیس</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Vazirmatn', Tahoma, sans-serif; background: #f0f4f8; padding: 20px; direction: rtl; }
+        @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+        .container { max-width: 1300px; margin: 0 auto; }
+        .header { background: white; padding: 15px 25px; border-radius: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .logo { font-size: 1.4rem; font-weight: bold; }
+        .auth-buttons button, .logout-btn { background: #3b82f6; color: white; border: none; padding: 8px 18px; border-radius: 30px; margin: 0 5px; cursor: pointer; }
+        .logout-btn { background: #ef4444; }
+        .dashboard { background: white; border-radius: 24px; padding: 20px; margin-bottom: 20px; }
+        .tabs { display: flex; gap: 10px; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; cursor: pointer; background: none; border: none; font-weight: bold; color: #64748b; }
+        .tab.active { color: #3b82f6; border-bottom: 3px solid #3b82f6; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .card { border: 1px solid #e2e8f0; border-radius: 20px; padding: 15px; background: #fafcff; }
+        .price { font-size: 1.4rem; font-weight: bold; margin: 10px 0; }
+        button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; margin: 4px; }
+        button.danger { background: #ef4444; }
+        button.success { background: #10b981; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 16px; border: 1px solid #cbd5e1; }
+        .message { background: #f1f5f9; padding: 10px; border-radius: 16px; margin: 10px 0; }
+        .discount-badge { background: #f59e0b; padding: 8px 16px; border-radius: 40px; display: inline-block; margin: 10px 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo">🎨 بازارچه طراحی چاپ</div>
+        <div id="authSection"><button onclick="showLoginModal()">ورود / ثبت‌نام</button></div>
+    </div>
+    <div id="mainContent"><div class="message">لطفاً وارد شوید.</div></div>
+</div>
+
+<div id="authModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+    <div style="background:white; padding:30px; border-radius:30px; width:90%; max-width:400px;">
+        <h3>ورود / ثبت‌نام</h3>
+        <input type="email" id="authEmail" placeholder="ایمیل">
+        <input type="text" id="authName" placeholder="نام کامل">
+        <select id="authRole"><option value="designer">طراح</option><option value="printer">چاپخانه</option></select>
+        <button onclick="auth()" style="width:100%;">ادامه</button>
+        <button onclick="closeModal()" style="background:#ccc; width:100%; margin-top:5px;">بستن</button>
+    </div>
+</div>
+
+<script>
+    // 🔧 اين دو خط را با اطلاعات سوپابيس خودت عوض كن 🔧
+    const SUPABASE_URL = "epiuybbwgqhysldtondp";   // <-- عوض كن
+    const SUPABASE_ANON_KEY = "sb_publishable_KlWaQVH7wrdshtr4CNJiHA_0ebE-JO6";                // <-- عوض كن
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let currentUser = null;
+
+    function showLoginModal() { document.getElementById("authModal").style.display = "flex"; }
+    function closeModal() { document.getElementById("authModal").style.display = "none"; }
+
+    async function auth() {
+        const email = document.getElementById("authEmail").value;
+        const name = document.getElementById("authName").value;
+        const role = document.getElementById("authRole").value;
+        if (!email || !name) { alert("ایمیل و نام لازم است"); return; }
+        let { data: existing } = await supabaseClient.from('users').select('*').eq('email', email).single();
+        if (existing) { currentUser = existing; }
+        else {
+            let { data: newUser, error } = await supabaseClient.from('users').insert([{ email, full_name: name, role }]).select().single();
+            if (error) { alert("خطا: " + error.message); return; }
+            currentUser = newUser;
+        }
+        closeModal();
+        renderDashboard();
+    }
+    function logout() { currentUser = null; renderDashboard(); }
+
+    async function renderDashboard() {
+        const main = document.getElementById("mainContent");
+        if (!currentUser) {
+            main.innerHTML = `<div class="message">لطفاً وارد شوید.</div>`;
+            document.getElementById("authSection").innerHTML = `<button onclick="showLoginModal()">ورود / ثبت‌نام</button>`;
+            return;
+        }
+        document.getElementById("authSection").innerHTML = `<span>${currentUser.full_name} (${currentUser.role === 'designer' ? 'طراح' : 'چاپخانه'})</span> <button class="logout-btn" onclick="logout()">خروج</button>`;
+        if (currentUser.role === 'designer') await designerDashboard();
+        else await printerDashboard();
+    }
+
+    async function designerDashboard() {
+        let { data: myDesigns } = await supabaseClient.from('designs').select('*').eq('designer_id', currentUser.id);
+        let { data: orderItems } = await supabaseClient.from('order_items').select('*, orders(*), designs(*)');
+        let sales = orderItems?.filter(oi => oi.designs?.designer_id === currentUser.id) || [];
+        let revenue = sales.reduce((s,oi) => s + oi.price_at_purchase, 0);
+        document.getElementById("mainContent").innerHTML = `
+            <div class="dashboard">
+                <div class="tabs"><button class="tab active" onclick="showDesignerList(${JSON.stringify(myDesigns).replace(/"/g,'&quot;')})">طرح‌های من</button><button class="tab" onclick="showAddDesign()">افزودن طرح</button><button class="tab" onclick="showDesignerStats(${sales.length},${revenue})">آمار فروش</button></div>
+                <div id="designerPanel"></div>
+            </div>`;
+        showDesignerList(myDesigns);
+    }
+    window.showDesignerList = (designs) => {
+        if(!designs?.length) { document.getElementById("designerPanel").innerHTML = "<div class='message'>طرحی ندارید</div>"; return; }
+        let html = `<div class="grid">`;
+        designs.forEach(d => { html += `<div class="card"><h3>${d.name}</h3><p>${d.type}</p><div class="price">${d.price.toLocaleString()} تومان</div><button onclick="editDesign('${d.id}','${d.name}','${d.type}',${d.price})">ویرایش</button><button class="danger" onclick="deleteDesign('${d.id}')">حذف</button></div>`; });
+        html += `</div>`;
+        document.getElementById("designerPanel").innerHTML = html;
+    };
+    window.showAddDesign = () => { document.getElementById("designerPanel").innerHTML = `<div><input id="newName" placeholder="نام"><input id="newType" placeholder="نوع"><input id="newPrice" placeholder="قیمت"><button onclick="addDesign()">ذخیره</button></div>`; };
+    window.addDesign = async () => {
+        let name = document.getElementById("newName").value, type = document.getElementById("newType").value, price = parseInt(document.getElementById("newPrice").value);
+        if(!name||!type||!price) return;
+        await supabaseClient.from('designs').insert([{ designer_id: currentUser.id, name, type, price }]);
+        renderDashboard();
+    };
+    window.editDesign = async (id,oldName,oldType,oldPrice) => {
+        let n=prompt("نام جدید",oldName), t=prompt("نوع جدید",oldType), p=parseInt(prompt("قیمت جدید",oldPrice));
+        if(n&&t&&p) await supabaseClient.from('designs').update({name:n, type:t, price:p}).eq('id',id);
+        renderDashboard();
+    };
+    window.deleteDesign = async (id) => { if(confirm("حذف شود؟")) await supabaseClient.from('designs').delete().eq('id',id); renderDashboard(); };
+    window.showDesignerStats = (count, rev) => { document.getElementById("designerPanel").innerHTML = `<div>تعداد فروش: ${count}<br>درآمد: ${rev.toLocaleString()} تومان</div>`; };
+
+    let printerCart = [];
+    async function printerDashboard() {
+        let { data: allDesigns } = await supabaseClient.from('designs').select('*, users(full_name)');
+        let now = new Date(), monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        let { data: monthOrders } = await supabaseClient.from('orders').select('*, order_items(*)').eq('printer_id', currentUser.id).gte('order_month', monthStart);
+        let bought = monthOrders?.reduce((s,o)=> s + (o.order_items?.length||0),0) || 0;
+        let disc = bought>=10 ? 70 : bought>=8 ? 60 : bought>=4 ? 50 : 0;
+        let saved = localStorage.getItem(`cart_${currentUser.id}`);
+        printerCart = saved ? JSON.parse(saved) : [];
+        document.getElementById("mainContent").innerHTML = `
+            <div class="dashboard"><div class="tabs"><button class="tab active" onclick="showShop(${JSON.stringify(allDesigns).replace(/"/g,'&quot;')})">فروشگاه</button><button class="tab" onclick="showPrinterCart()">سبد (${printerCart.length})</button><button class="tab" onclick="showPrinterOrders()">سفارشات</button></div>
+            <div id="printerPanel"></div><div class="discount-badge">تخفیف ماه جاری: ${disc}% (${bought} طرح)</div></div>`;
+        showShop(allDesigns);
+    }
+    window.showShop = (designs) => {
+        let html = `<div class="grid">`;
+        designs.forEach(d => { html += `<div class="card"><h3>${d.name}</h3><p>${d.type}</p><div class="price">${d.price.toLocaleString()} تومان</div><button onclick="addToCart('${d.id}')">➕ افزودن به سبد</button></div>`; });
+        html += `</div>`;
+        document.getElementById("printerPanel").innerHTML = html;
+    };
+    window.addToCart = (id) => { if(!printerCart.includes(id)){ printerCart.push(id); localStorage.setItem(`cart_${currentUser.id}`,JSON.stringify(printerCart)); renderDashboard(); } };
+    window.showPrinterCart = async () => {
+        if(printerCart.length===0){ document.getElementById("printerPanel").innerHTML="<div class='message'>سبد خالی</div>"; return; }
+        let designs=[];
+        for(let id of printerCart){ let {data:d}=await supabaseClient.from('designs').select('*').eq('id',id).single(); if(d) designs.push(d); }
+        let total=designs.reduce((s,d)=>s+d.price,0);
+        let now=new Date(), monthStart=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
+        let {data:monthOrders}=await supabaseClient.from('orders').select('*, order_items(*)').eq('printer_id',currentUser.id).gte('order_month',monthStart);
+        let bought=monthOrders?.reduce((s,o)=>s+(o.order_items?.length||0),0)||0;
+        let disc=bought>=10?70:bought>=8?60:bought>=4?50:0;
+        let final=total*(1-disc/100);
+        let html=`<div>`;
+        designs.forEach(d=>{ html+=`<div style="display:flex; justify-content:space-between;">${d.name} - ${d.price.toLocaleString()} تومان <button class="danger" onclick="removeFromCart('${d.id}')">حذف</button></div>`; });
+        html+=`<hr>قیمت اصلی: ${total.toLocaleString()} تومان<br>تخفیف ${disc}%: ${(total-final).toLocaleString()} تومان<br><strong>قابل پرداخت: ${Math.floor(final).toLocaleString()} تومان</strong><br><button class="success" onclick="finalizeOrder()">ثبت سفارش ماهانه</button></div>`;
+        document.getElementById("printerPanel").innerHTML = html;
+    };
+    window.removeFromCart = (id) => { printerCart = printerCart.filter(i=>i!==id); localStorage.setItem(`cart_${currentUser.id}`,JSON.stringify(printerCart)); renderDashboard(); };
+    window.finalizeOrder = async () => {
+        if(printerCart.length===0) return;
+        let designs=[]; for(let id of printerCart){ let {data:d}=await supabaseClient.from('designs').select('*').eq('id',id).single(); if(d) designs.push(d); }
+        let total=designs.reduce((s,d)=>s+d.price,0);
+        let now=new Date(), monthStart=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
+        let {data:monthOrders}=await supabaseClient.from('orders').select('*, order_items(*)').eq('printer_id',currentUser.id).gte('order_month',monthStart);
+        let bought=monthOrders?.reduce((s,o)=>s+(o.order_items?.length||0),0)||0;
+        let disc=bought>=10?70:bought>=8?60:bought>=4?50:0;
+        let final=total*(1-disc/100);
+        let {data:order,error}=await supabaseClient.from('orders').insert([{printer_id:currentUser.id, order_month:monthStart, total_amount:Math.floor(final), discount_percent:disc}]).select().single();
+        if(error){ alert(error.message); return; }
+        for(let d of designs){ await supabaseClient.from('order_items').insert([{order_id:order.id, design_id:d.id, price_at_purchase:d.price}]); }
+        printerCart=[]; localStorage.removeItem(`cart_${currentUser.id}`); alert(`سفارش ثبت شد. مبلغ: ${Math.floor(final).toLocaleString()} تومان`); renderDashboard();
+    };
+    window.showPrinterOrders = async () => {
+        let {data:orders}=await supabaseClient.from('orders').select('*, order_items(*)').eq('printer_id',currentUser.id);
+        if(!orders?.length){ document.getElementById("printerPanel").innerHTML="<div class='message'>سفارشی نیست</div>"; return; }
+        let html="";
+        for(let o of orders){ html+=`<div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:16px;">تاریخ: ${new Date(o.created_at).toLocaleDateString('fa-IR')} - تخفیف: ${o.discount_percent}% - مبلغ: ${o.total_amount.toLocaleString()} تومان - تعداد: ${o.order_items?.length||0} طرح</div>`; }
+        document.getElementById("printerPanel").innerHTML = html;
+    };
+    renderDashboard();
+</script>
+</body>
+</html>
